@@ -1,6 +1,6 @@
 # 🚀 Crew Achievements
 
-A sci-fi-themed classroom achievement tracker built for teachers who want to gamify student participation, reward growth, and make learning more engaging --- without sacrificing privacy or flexibility.
+A sci-fi-themed classroom achievement tracker built for teachers who want to gamify student participation, reward growth, and make learning more engaging — without sacrificing privacy or flexibility.
 
 ---
 
@@ -8,29 +8,21 @@ A sci-fi-themed classroom achievement tracker built for teachers who want to gam
 
 ### ✅ Key Features
 
-- 🔐 **Admin login system** with bcrypt password protection
-
-- 👥 **Add students easily** --- pseudonym generator with team auto-balancing
-
-- 🏆 **Create, edit, assign achievements** from the web UI (no JSON hacking required)
-
-- 📊 **Student overview table** --- filter, search, and monitor progress at-a-glance
-
-- ⚡ **Bulk actions** --- mass student creation and achievement assignment
-
-- 🎨 **Mobile-friendly UI** with cards, stats, and celebration effects
-
-- 🔄 **Auto team balancing** to keep teams evenly populated
+- 🔐 **Admin login system** with bcrypt password protection  
+- 👥 **Add students easily** — pseudonym generator with team auto-balancing  
+- 🏆 **Create, edit, assign achievements** from the web UI (no JSON hacking required)  
+- 📊 **Student overview table** — filter, search, and monitor progress at a glance  
+- ⚡ **Bulk actions** — mass student creation and achievement assignment  
+- 🎨 **Mobile-friendly UI** with cards, stats, and celebration effects  
+- 🔄 **Auto team balancing** to keep teams evenly populated  
 
 ---
 
 ## 🎯 Why It Exists
 
-- ✅ Simplifies classroom management --- no spreadsheets, no scripting
-
-- ✅ Gives kids a fun, visual system to track their growth
-
-- ✅ Lets teachers focus on *what* to reward, not *how*
+- ✅ Simplifies classroom management — no spreadsheets, no scripting  
+- ✅ Gives kids a fun, visual system to track their growth  
+- ✅ Lets teachers focus on *what* to reward, not *how*  
 
 ---
 
@@ -39,221 +31,152 @@ A sci-fi-themed classroom achievement tracker built for teachers who want to gam
 ### 1. Clone & Install
 
 ```bash
-
 git clone https://github.com/bgweaver/crew-achievement.git
-
 cd crew-achievement
-
 npm install
+```
 
-2\. Create Data Directory
+### 2. Create Data Directory
 
-bash
-
-Copy
-
-Edit
-
+```bash
 mkdir data
+```
 
-3\. Run It
+### 3. Run It
 
-bash
-
-Copy
-
-Edit
-
+```bash
 npm start
-
 # or for dev auto-reload:
-
 npm run dev
+```
 
-4\. Open in Browser
+### 4. Open in Browser
 
-Student Login: http://localhost:3000
+- **Student Login**: http://localhost:3000  
+- **Admin Panel**: http://localhost:3000/admin-login  
+  - Default: `admin` / `admin123`
 
-Admin Panel: http://localhost:3000/admin-login
+---
 
-Default: admin / admin123
+## 🔧 Configuration
 
-🔧 Configuration
+### Change Admin Password
 
-Change Admin Password
+1. Generate a new bcrypt hash:
 
-Generate a new bcrypt hash (see below)
-
-Edit /data/admin.json and replace the password hash
-
-bash
-
-Copy
-
-Edit
-
+```bash
 node
-
 > const bcrypt = require('bcrypt')
-
 > bcrypt.hashSync("newpassword", 10)
+```
 
-Environment Variables (Optional)
+2. Edit `/data/admin.json` and replace the password hash.
 
-You can use a .env file for production setup:
+### Environment Variables (Optional)
 
-env
+Create a `.env` file:
 
-Copy
-
-Edit
-
+```env
 SESSION_SECRET=your-super-secret-key
-
 ADMIN_USERNAME=your-admin
-
 ADMIN_PASSWORD=your-bcrypt-hash
-
 NODE_ENV=production
+```
 
-📱 Usage Guide
+---
 
-For Teachers (Admin Panel)
+## 📱 Usage Guide
 
-👤 Managing Students
+### 👤 Managing Students (Admin Panel)
 
-Add Individually --- click 🎲 to generate pseudonym and PIN
+- **Add Individually** — click 🎲 to generate pseudonym and PIN  
+- **Bulk Create** — choose count + theme (Space, Ocean, Forest)  
+- **Auto-balance Teams** — or assign manually  
+- **Delete** — directly from the Manage view  
 
-Bulk Create --- choose count + theme (Space, Ocean, Forest)
+### 🏆 Managing Achievements
 
-Auto-balance Teams --- or assign manually
+- **Create/Edit/Delete** — title, description, points, optional image  
+- **Assign Individually** — via student editor  
+- **Assign in Bulk** — apply to entire team  
 
-Delete --- right from the Manage view
+### 📊 Dashboards & Overview
 
-🏆 Managing Achievements
+- Team breakdown, progress bars, and overall stats  
+- Visual progress % on the **Admin → Overview** page  
+- See which achievements are most/least earned  
 
-Create/Edit/Delete --- title, description, points, optional image
+### For Students
 
-Assign Individually --- via student editor
+- Visual Progress Bar and Unlocked Achievements  
+- Team Affiliation badge with color  
+- Rank System: Rookie → Novice → Intermediate → Advanced → Elite  
+- 🎉 Celebration Effects on unlock  
 
-Assign in Bulk --- apply to entire team
+---
 
-📊 Dashboards & Overview
+## 🌐 Deployment Options
 
-Team breakdown, progress bars, and overall stats
+### 🔹 Option 1: DigitalOcean (Manual VPS)
 
-Progress % shown visually on the Admin → Overview page
-
-See which achievements are most/least earned
-
-For Students
-
-Visual Progress Bar and Unlocked Achievements
-
-Team Affiliation badge with color
-
-Rank System: Rookie → Novice → Intermediate → Advanced → Elite
-
-🎉 Celebration Effects when new achievements unlock
-
-🌐 Deployment Options
-
-🔹 Option 1: DigitalOcean (Manual VPS)
-
-bash
-
-Copy
-
-Edit
-
+```bash
 sudo apt update
-
 sudo apt install nodejs npm nginx
-
 git clone your-repo
-
 cd crew-achievements
-
 npm install
-
 npm install -g pm2
-
 pm2 start app.js --name crew-achievements
-
 pm2 startup
-
 pm2 save
+```
 
-NGINX config:
+#### NGINX config
 
-nginx
-
-Copy
-
-Edit
-
+```nginx
 server {
+    listen 80;
+    server_name your-domain.com;
 
-    listen 80;
-
-    server_name your-domain.com;
-
-    location / {
-
-        proxy_pass http://localhost:3000;
-
-        proxy_http_version 1.1;
-
-        proxy_set_header Upgrade $http_upgrade;
-
-        proxy_set_header Connection 'upgrade';
-
-        proxy_set_header Host $host;
-
-        proxy_cache_bypass $http_upgrade;
-
-    }
-
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
 }
+```
 
-Enable HTTPS with:
+Enable HTTPS:
 
-bash
-
-Copy
-
-Edit
-
+```bash
 sudo apt install certbot python3-certbot-nginx
-
 sudo certbot --nginx
+```
 
-🔹 Option 2: Railway (GUI Hosting)
+### 🔹 Option 2: Railway (GUI Hosting)
 
-Connect GitHub repo
+- Connect GitHub repo  
+- Set env vars in dashboard  
+- Auto-deploy  
 
-Set env vars in dashboard
+### 🔹 Option 3: Heroku
 
-Auto-deploy
+- Same flow: GitHub → Deploy  
+- Note: no free tier anymore
 
-🔹 Option 3: Heroku (no free tier anymore)
+### 🔹 Option 4: Docker
 
-Same flow: GitHub → Deploy
+#### Dockerfile
 
-🔹 Option 4: Docker
-
-Dockerfile
-
-Copy
-
-Edit
-
+```Dockerfile
 FROM node:18-alpine
 
 WORKDIR /app
 
 COPY package*.json ./
-
 RUN npm install
 
 COPY . .
@@ -261,41 +184,39 @@ COPY . .
 EXPOSE 3000
 
 CMD ["npm", "start"]
+```
 
-🔒 Security Best Practices
+---
 
-🧠 Change default admin credentials immediately
+## 🔒 Security Best Practices
 
-🔐 Use HTTPS via Let's Encrypt or reverse proxy
+- 🧠 Change default admin credentials immediately  
+- 🔐 Use HTTPS via Let’s Encrypt or reverse proxy  
+- 💾 Back up `/data` regularly  
+- 🛡️ Use strong session secrets  
+- 🔍 Monitor access logs if public-facing  
 
-💾 Back up /data regularly
+---
 
-🛡️ Use strong session secrets
+## 💡 Future Ideas & Roadmap
 
-🔍 Monitor access logs if public-facing
+- 👤 Student profiles with avatars  
+- 🔥 Achievement streaks and milestones  
+- 💪 Team challenges and co-op achievements  
+- 🏅 Badges beyond raw points  
+- 🧭 Story progression mode ("missions")  
+- 🔊 Sound FX on achievement unlocks  
+- 🖥️ Admin tools for user import/export and CSV sync  
 
-💡 Future Ideas & Roadmap
+---
 
-👤 Student profiles with avatars
+## 🙌 Credits
 
-🔥 Achievement streaks and milestones
-
-💪 Team challenges and co-op achievements
-
-🏅 Badges beyond raw points
-
-🧭 Story progression mode ("missions")
-
-🔊 Sound FX on achievement unlocks
-
-🖥️ Admin tools for user import/export and CSV sync
-
-🙌 Credits
-
-Built by a chaotic teacher/hacker hybrid for the classroom of tomorrow.
-
+Built by a chaotic teacher/hacker hybrid for the classroom of tomorrow.  
 Contributions, forks, and weird ideas welcome.
 
-✨ License
+---
+
+## ✨ License
 
 MIT. Share it, remix it, gamify your life.
