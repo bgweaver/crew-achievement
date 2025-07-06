@@ -1,29 +1,440 @@
+/* Space Theme CSS - Enhanced for Readability */
+
+/* Root variables for consistent theming */
+:root {
+  --space-dark: #0a0a1a;
+  --space-medium: #1a1a40;
+  --space-light: #2e2e6e;
+  --space-accent: #4b6ef5;
+  --space-secondary: #6c5ce7;
+  --space-gold: #ffd700;
+  --space-silver: #c0c0c0;
+  --space-bronze: #cd7f32;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0f0;
+  --text-muted: #a0a0c0;
+  --success: #28c76f;
+  --warning: #ff9f43;
+  --danger: #ea5455;
+  --info: #00cfe8;
+  --glow: 0 0 20px rgba(75, 110, 245, 0.3);
+  --glow-strong: 0 0 30px rgba(75, 110, 245, 0.5);
+}
+
+/* Base styling with space background */
 body {
-  background-color: #0e0e2c;
-  color: #e0e0f0;
+  background: linear-gradient(135deg, var(--space-dark) 0%, var(--space-medium) 50%, var(--space-light) 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
+/* Starfield animation background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.7), transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: starfield 20s linear infinite;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+@keyframes starfield {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100px); }
+}
+
+/* Card and container styling */
 .card {
-  background-color: #1a1a40;
-  border: 1px solid #2e2e6e;
+  background: rgba(26, 26, 64, 0.95);
+  border: 1px solid rgba(75, 110, 245, 0.3);
+  border-radius: 15px;
+  box-shadow: var(--glow);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
-.card-title, .card-text {
-  color: #fff;
+.card:hover {
+  box-shadow: var(--glow-strong);
+  transform: translateY(-2px);
 }
 
-.locked {
-  filter: grayscale(100%) brightness(70%);
-  opacity: 0.6;
+.card-title {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
+.card-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Login container specific styling */
+.login-container {
+  background: rgba(26, 26, 64, 0.95);
+  border: 1px solid rgba(75, 110, 245, 0.4);
+  border-radius: 20px;
+  box-shadow: var(--glow);
+  backdrop-filter: blur(15px);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--space-accent), transparent);
+  animation: scanline 2s linear infinite;
+}
+
+@keyframes scanline {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Form styling */
+.form-control {
+  background: rgba(46, 46, 110, 0.8);
+  border: 1px solid rgba(75, 110, 245, 0.4);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  background: rgba(46, 46, 110, 0.9);
+  border-color: var(--space-accent);
+  box-shadow: 0 0 0 0.2rem rgba(75, 110, 245, 0.25);
+  color: var(--text-primary);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+/* Button styling */
 .btn-primary {
-  background-color: #4b6ef5;
+  background: linear-gradient(135deg, var(--space-accent), var(--space-secondary));
   border: none;
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--space-secondary), var(--space-accent));
+  box-shadow: 0 8px 25px rgba(75, 110, 245, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-success {
-  background-color: #28c76f;
+  background: linear-gradient(135deg, var(--success), #22c55e);
   border: none;
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #22c55e, var(--success));
+  box-shadow: 0 8px 25px rgba(40, 199, 111, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--warning), #f59e0b);
+  border: none;
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger), #ef4444);
+  border: none;
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Achievement states */
+.locked {
+  filter: grayscale(100%) brightness(40%);
+  opacity: 0.6;
+  position: relative;
+}
+
+.locked::after {
+  content: '🔒';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  z-index: 2;
+}
+
+.unlocked {
+  animation: unlock 0.5s ease;
+  box-shadow: 0 0 20px rgba(40, 199, 111, 0.5);
+}
+
+@keyframes unlock {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Team standings styling */
+.team-standings {
+  background: rgba(26, 26, 64, 0.9);
+  border: 1px solid rgba(75, 110, 245, 0.3);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--glow);
+}
+
+.team-item {
+  background: rgba(46, 46, 110, 0.8);
+  border: 1px solid rgba(75, 110, 245, 0.2);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.team-item:hover {
+  background: rgba(46, 46, 110, 0.9);
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px rgba(75, 110, 245, 0.3);
+}
+
+/* Badge styling */
+.badge {
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bg-warning {
+  background: linear-gradient(135deg, var(--space-gold), #f59e0b) !important;
+}
+
+.bg-secondary {
+  background: linear-gradient(135deg, var(--space-silver), #64748b) !important;
+}
+
+.bg-info {
+  background: linear-gradient(135deg, var(--space-bronze), #cd7f32) !important;
+}
+
+.bg-danger {
+  background: linear-gradient(135deg, var(--danger), #ef4444) !important;
+}
+
+.bg-success {
+  background: linear-gradient(135deg, var(--success), #22c55e) !important;
+}
+
+/* Alert styling */
+.alert {
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.alert-danger {
+  background: rgba(234, 84, 85, 0.9);
+  color: var(--text-primary);
+}
+
+.alert-success {
+  background: rgba(40, 199, 111, 0.9);
+  color: var(--text-primary);
+}
+
+/* Text colors for better readability */
+.text-white {
+  color: var(--text-primary) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.text-primary {
+  color: var(--space-accent) !important;
+}
+
+/* Links */
+a {
+  color: var(--space-accent);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  color: var(--space-secondary);
+  text-shadow: 0 0 5px rgba(75, 110, 245, 0.5);
+}
+
+/* Admin panel specific */
+.admin-container {
+  background: rgba(26, 26, 64, 0.95);
+  border: 1px solid rgba(75, 110, 245, 0.4);
+  border-radius: 15px;
+  box-shadow: var(--glow);
+  backdrop-filter: blur(10px);
+}
+
+.nav-tabs .nav-link {
+  background: rgba(46, 46, 110, 0.8);
+  border: 1px solid rgba(75, 110, 245, 0.3);
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  background: rgba(46, 46, 110, 0.9);
+  color: var(--text-primary);
+}
+
+.nav-tabs .nav-link.active {
+  background: var(--space-accent);
+  border-color: var(--space-accent);
+  color: var(--text-primary);
+}
+
+/* Table styling */
+.table {
+  color: var(--text-secondary);
+}
+
+.table th {
+  background: rgba(46, 46, 110, 0.8);
+  border-color: rgba(75, 110, 245, 0.3);
+  color: var(--text-primary);
+}
+
+.table td {
+  border-color: rgba(75, 110, 245, 0.2);
+}
+
+.table-hover tbody tr:hover {
+  background: rgba(46, 46, 110, 0.5);
+  color: var(--text-primary);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .team-item {
+    font-size: 0.9rem;
+  }
+  
+  .btn-lg {
+    font-size: 1rem;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--space-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--space-accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--space-secondary);
+}
+
+/* Heading styling - Override Bootstrap defaults */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+h1 {
+  color: var(--space-accent) !important;
+  text-shadow: 0 0 15px rgba(75, 110, 245, 0.4);
+}
+
+h2 {
+  color: var(--text-primary) !important;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+/* Text colors for better readability */
+.text-white {
+  color: var(--text-primary) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.text-primary {
+  color: var(--space-accent) !important;
 }

@@ -4,31 +4,151 @@
   <title>Crew Dashboard</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/style.css">
+  <style>
+    .achievement-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .achievement-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    .locked {
+      opacity: 0.5;
+      filter: grayscale(100%);
+    }
+    .unlocked {
+      border: 2px solid #28a745;
+      box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+    }
+    .progress-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      font-weight: bold;
+      margin: 0 auto 20px;
+    }
+    .team-badge {
+      font-size: 1.1em;
+      padding: 8px 16px;
+    }
+  </style>
 </head>
-<body class="container mt-5">
-  <h1>Welcome, <%= pseudonym %>!</h1>
-  <p><strong>Total Points:</strong> <%= totalPoints %></p>
-  <p>
-  <strong>Achievements:</strong>
-  <span class="<%= unlocked.length === achievements.length ? 'text-success fw-bold' : '' %>">
-    <%= unlocked.length %> / <%= achievements.length %>
-  </span>
-</p>
+<body class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1>🚀 Welcome back, <%= pseudonym %>!</h1>
+      <p class="lead">
+        <span class="badge team-badge bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %>">
+          <%= team %> Team
+        </span>
+      </p>
+    </div>
+    <div class="col-md-4 text-end">
+      <div class="progress-circle bg-<%= unlocked.length === achievements.length ? 'success' : 'light' %> text-<%= unlocked.length === achievements.length ? 'white' : 'dark' %>">
+        <%= Math.round((unlocked.length / achievements.length) * 100) %>%
+      </div>
+    </div>
+  </div>
 
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Total Points</h5>
+          <h2 class="text-primary"><%= totalPoints %></h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Achievements</h5>
+          <h2 class="<%= unlocked.length === achievements.length ? 'text-success' : 'text-warning' %>">
+            <%= unlocked.length %> / <%= achievements.length %>
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Rank</h5>
+          <h2 class="text-info">
+            <%= unlocked.length === achievements.length ? 'Elite' : 
+                unlocked.length >= achievements.length * 0.75 ? 'Advanced' :
+                unlocked.length >= achievements.length * 0.5 ? 'Intermediate' :
+                unlocked.length >= achievements.length * 0.25 ? 'Novice' : 'Rookie' %>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if (unlocked.length === achievements.length) { %>
+    <div class="alert alert-success text-center mb-4">
+      <h4>🎉 Congratulations! 🎉</h4>
+      <p>You've unlocked all achievements! You're a true crew elite!</p>
+    </div>
+  <% } %>
 
   <div class="row">
     <% achievements.forEach(a => { %>
-      <div class="col-md-4 mb-4">
-        <div class="card">
-          <img src="<%= a.image %>" class="card-img-top <%= unlocked.includes(a.id) ? '' : 'locked' %>" alt="Achievement">
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card achievement-card <%= unlocked.includes(a.id) ? 'unlocked' : 'locked' %>">
+          <div class="position-relative">
+            <img src="<%= a.image %>" class="card-img-top" alt="Achievement" style="height: 200px; object-fit: cover;">
+            <% if (unlocked.includes(a.id)) { %>
+              <div class="position-absolute top-0 end-0 p-2">
+                <span class="badge bg-success">✓ Unlocked</span>
+              </div>
+            <% } else { %>
+              <div class="position-absolute top-0 end-0 p-2">
+                <span class="badge bg-secondary">🔒 Locked</span>
+              </div>
+            <% } %>
+          </div>
           <div class="card-body">
             <h5 class="card-title"><%= a.title %></h5>
             <p class="card-text"><%= a.description %></p>
-            <span class="badge bg-success"><%= a.points %> pts</span>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="badge bg-<%= unlocked.includes(a.id) ? 'success' : 'secondary' %> fs-6">
+                <%= a.points %> pts
+              </span>
+              <% if (unlocked.includes(a.id)) { %>
+                <small class="text-success">🌟 Earned!</small>
+              <% } else { %>
+                <small class="text-muted">Keep going!</small>
+              <% } %>
+            </div>
           </div>
         </div>
       </div>
     <% }) %>
   </div>
+
+  <div class="text-center mt-4">
+    <a href="/" class="btn btn-outline-primary">← Back to Login</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Add some fun interactions
+    document.querySelectorAll('.achievement-card').forEach(card => {
+      card.addEventListener('click', function() {
+        if (this.classList.contains('unlocked')) {
+          // Add a celebration effect
+          this.style.transform = 'scale(1.05)';
+          setTimeout(() => {
+            this.style.transform = '';
+          }, 200);
+        }
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,17 +1,23 @@
 {
-  "name": "achievement-tracker-v3",
+  "name": "crew-achievements",
   "version": "1.0.0",
+  "description": "A sci-fi themed achievement tracker for students",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "body-parser": "^2.2.0",
-    "ejs": "^3.1.10",
-    "express": "^5.1.0"
-  }
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.9",
+    "bcrypt": "^5.1.1",
+    "express-session": "^1.17.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["education", "gamification", "achievement", "student-tracking"],
+  "author": "Ben Weaver",
+  "license": "MIT"
 }
