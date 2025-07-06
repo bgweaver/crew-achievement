@@ -1,112 +1,301 @@
 # 🚀 Crew Achievements
 
-A sci-fi-themed class achievement tracker built for teachers, by a teacher.  
-Each student is a crewmate aboard a spacefaring science vessel — earning achievements, scoring points, and competing as part of their color-coded team.
-
-This app was built to gamify classroom engagement in a fun, FERPA-compliant way without relying on expensive third-party platforms.
+A sci-fi-themed classroom achievement tracker built for teachers who want to gamify student participation, reward growth, and make learning more engaging --- without sacrificing privacy or flexibility.
 
 ---
 
-## ✨ Features
+## 📋 What's New
 
-- 🔐 **Secure Student Login** via pseudonym + PIN (no real names used)
-- 🏆 **Achievement Dashboard** with:
-  - Colorful images for unlocked achievements
-  - Greyed-out locked ones
-  - Point values and a total counter
-  - Progress summary: `X / Y achievements earned`
-- 📊 **Team Scores** — tracks point totals for each team (Red, Blue, Green, Yellow)
-- 🛠 **Admin Panel**:
-  - Award achievements individually or in bulk
-  - Bulk assign by team or entire class
-- 💾 **JSON-Based Backend** for simplicity and local hosting
-- 🎨 **Bootstrap styling** with room for custom flair
+### ✅ Key Features
 
----
+- 🔐 **Admin login system** with bcrypt password protection
 
-## 🧠 Tech Stack
+- 👥 **Add students easily** --- pseudonym generator with team auto-balancing
 
-- Node.js + Express
-- EJS templating
-- Bootstrap 5
-- Plain JSON for data storage (`/data/students.json` and `/data/achievements.json`)
+- 🏆 **Create, edit, assign achievements** from the web UI (no JSON hacking required)
+
+- 📊 **Student overview table** --- filter, search, and monitor progress at-a-glance
+
+- ⚡ **Bulk actions** --- mass student creation and achievement assignment
+
+- 🎨 **Mobile-friendly UI** with cards, stats, and celebration effects
+
+- 🔄 **Auto team balancing** to keep teams evenly populated
 
 ---
 
-## 🚧 Setup Instructions
+## 🎯 Why It Exists
 
-1. Clone the repo:
+- ✅ Simplifies classroom management --- no spreadsheets, no scripting
+
+- ✅ Gives kids a fun, visual system to track their growth
+
+- ✅ Lets teachers focus on *what* to reward, not *how*
+
+---
+
+## 🛠️ Setup & Installation
+
+### 1. Clone & Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/crew-achievements.git
-cd crew-achievements
-```
 
-2. Install dependencies:
+git clone https://github.com/bgweaver/crew-achievement.git
 
-```bash
+cd crew-achievement
+
 npm install
-```
 
-3. Start the server:
+2\. Create Data Directory
 
-```bash
-node app.js
-```
+bash
 
-4. Visit http://localhost:3000
+Copy
 
----
+Edit
 
-## 🗃 File Structure
+mkdir data
 
-```
-├── app.js                 # Main server
-├── views/                # EJS templates
-├── public/               # Static files (CSS, images)
-├── data/
-│   ├── students.json     # Student data (pseudonym, pin, team, unlocked)
-│   └── achievements.json # Achievements (id, title, description, image, points)
-├── .gitignore
-└── README.md
-```
+3\. Run It
 
----
+bash
 
-## 🔐 FERPA Compliance Notes
+Copy
 
-- No student names or personal info are stored
-- Login uses pseudonyms and PINs only
-- All student-facing data is strictly anonymized
-- You are responsible for protecting your server if hosted externally
+Edit
 
----
+npm start
 
-## 🧩 Future Features (Wishlist)
+# or for dev auto-reload:
 
-- Admin login with password
-- Add/edit achievements from the admin panel
-- Add students (and auto-generate PINs/pseudonyms) from admin panel
-- Export student progress as CSV
-- Upload custom icons/images
-- Dark mode (because... space)
+npm run dev
 
----
+4\. Open in Browser
 
-## 📸 Screenshots
+Student Login: http://localhost:3000
 
-Coming soon — or drop your own!
+Admin Panel: http://localhost:3000/admin-login
 
----
+Default: admin / admin123
 
-## 🧪 Built By
+🔧 Configuration
 
-A nerdy 5th grade science teacher with a home lab, a stubborn dog, and a low tolerance for expensive education software that stops working mid-year.
+Change Admin Password
 
-If you fork this or improve it, feel free to tag me in — I'd love to see how others use it.
+Generate a new bcrypt hash (see below)
 
----
+Edit /data/admin.json and replace the password hash
 
-## 🛰 License
+bash
 
-MIT — use, share, improve, or turn it into a space lizard cult. I won't stop you.
+Copy
+
+Edit
+
+node
+
+> const bcrypt = require('bcrypt')
+
+> bcrypt.hashSync("newpassword", 10)
+
+Environment Variables (Optional)
+
+You can use a .env file for production setup:
+
+env
+
+Copy
+
+Edit
+
+SESSION_SECRET=your-super-secret-key
+
+ADMIN_USERNAME=your-admin
+
+ADMIN_PASSWORD=your-bcrypt-hash
+
+NODE_ENV=production
+
+📱 Usage Guide
+
+For Teachers (Admin Panel)
+
+👤 Managing Students
+
+Add Individually --- click 🎲 to generate pseudonym and PIN
+
+Bulk Create --- choose count + theme (Space, Ocean, Forest)
+
+Auto-balance Teams --- or assign manually
+
+Delete --- right from the Manage view
+
+🏆 Managing Achievements
+
+Create/Edit/Delete --- title, description, points, optional image
+
+Assign Individually --- via student editor
+
+Assign in Bulk --- apply to entire team
+
+📊 Dashboards & Overview
+
+Team breakdown, progress bars, and overall stats
+
+Progress % shown visually on the Admin → Overview page
+
+See which achievements are most/least earned
+
+For Students
+
+Visual Progress Bar and Unlocked Achievements
+
+Team Affiliation badge with color
+
+Rank System: Rookie → Novice → Intermediate → Advanced → Elite
+
+🎉 Celebration Effects when new achievements unlock
+
+🌐 Deployment Options
+
+🔹 Option 1: DigitalOcean (Manual VPS)
+
+bash
+
+Copy
+
+Edit
+
+sudo apt update
+
+sudo apt install nodejs npm nginx
+
+git clone your-repo
+
+cd crew-achievements
+
+npm install
+
+npm install -g pm2
+
+pm2 start app.js --name crew-achievements
+
+pm2 startup
+
+pm2 save
+
+NGINX config:
+
+nginx
+
+Copy
+
+Edit
+
+server {
+
+    listen 80;
+
+    server_name your-domain.com;
+
+    location / {
+
+        proxy_pass http://localhost:3000;
+
+        proxy_http_version 1.1;
+
+        proxy_set_header Upgrade $http_upgrade;
+
+        proxy_set_header Connection 'upgrade';
+
+        proxy_set_header Host $host;
+
+        proxy_cache_bypass $http_upgrade;
+
+    }
+
+}
+
+Enable HTTPS with:
+
+bash
+
+Copy
+
+Edit
+
+sudo apt install certbot python3-certbot-nginx
+
+sudo certbot --nginx
+
+🔹 Option 2: Railway (GUI Hosting)
+
+Connect GitHub repo
+
+Set env vars in dashboard
+
+Auto-deploy
+
+🔹 Option 3: Heroku (no free tier anymore)
+
+Same flow: GitHub → Deploy
+
+🔹 Option 4: Docker
+
+Dockerfile
+
+Copy
+
+Edit
+
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+
+🔒 Security Best Practices
+
+🧠 Change default admin credentials immediately
+
+🔐 Use HTTPS via Let's Encrypt or reverse proxy
+
+💾 Back up /data regularly
+
+🛡️ Use strong session secrets
+
+🔍 Monitor access logs if public-facing
+
+💡 Future Ideas & Roadmap
+
+👤 Student profiles with avatars
+
+🔥 Achievement streaks and milestones
+
+💪 Team challenges and co-op achievements
+
+🏅 Badges beyond raw points
+
+🧭 Story progression mode ("missions")
+
+🔊 Sound FX on achievement unlocks
+
+🖥️ Admin tools for user import/export and CSV sync
+
+🙌 Credits
+
+Built by a chaotic teacher/hacker hybrid for the classroom of tomorrow.
+
+Contributions, forks, and weird ideas welcome.
+
+✨ License
+
+MIT. Share it, remix it, gamify your life.
