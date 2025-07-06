@@ -1,0 +1,17 @@
+[
+  {
+    "pseudonym": "Red-01",
+    "pin": "1234",
+    "team": "Red",
+    "unlocked": [
+      "a1",
+      "a2"
+    ]
+  },
+  {
+    "pseudonym": "Blue-02",
+    "pin": "5678",
+    "team": "Blue",
+    "unlocked": []
+  }
+]

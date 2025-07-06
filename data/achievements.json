@@ -1,0 +1,23 @@
+[
+  {
+    "id": "a1",
+    "title": "Turned in homework on time",
+    "description": "Submitted the assignment before the deadline.",
+    "points": 10,
+    "image": "/images/homework.png"
+  },
+  {
+    "id": "a2",
+    "title": "Helped a classmate",
+    "description": "Provided meaningful assistance to a crewmate in distress.",
+    "points": 15,
+    "image": "/images/help.png"
+  },
+  {
+    "id": "a3",
+    "title": "Answered a tough question",
+    "description": "Displayed initiative by answering a difficult question in class.",
+    "points": 20,
+    "image": "/images/question.webp"
+  }
+]

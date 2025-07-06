@@ -1,0 +1,29 @@
+body {
+  background-color: #0e0e2c;
+  color: #e0e0f0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+  background-color: #1a1a40;
+  border: 1px solid #2e2e6e;
+}
+
+.card-title, .card-text {
+  color: #fff;
+}
+
+.locked {
+  filter: grayscale(100%) brightness(70%);
+  opacity: 0.6;
+}
+
+.btn-primary {
+  background-color: #4b6ef5;
+  border: none;
+}
+
+.btn-success {
+  background-color: #28c76f;
+  border: none;
+}
