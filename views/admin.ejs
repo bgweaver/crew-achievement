@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Crew Control Center</title>
+  <title>Valiant Inquiry - Crew Control Center</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/style.css">
   <style>
@@ -14,7 +14,7 @@
   </style>
 </head>
 <body class="container-fluid mt-3">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <nav class="navbar navbar-expand-lg navbar-dark mb-4">
     <div class="container-fluid">
       <span class="navbar-brand">🚀 Crew Control Center</span>
       <div class="navbar-nav ms-auto">
@@ -107,7 +107,7 @@
               <h5>Editing: <%= selectedStudent.pseudonym %> (<%= selectedStudent.team %> Team)</h5>
               <button class="btn btn-sm btn-danger" onclick="deleteStudent('<%= selectedStudent.pseudonym %>')">Delete Student</button>
             </div>
-            <div class="card-body">
+            <div class="card-body text-white">
               <form method="POST" action="/admin">
                 <input type="hidden" name="pseudonym" value="<%= selectedStudent.pseudonym %>">
                 <div class="row">
@@ -132,12 +132,12 @@
       </div>
 
       <!-- Quick Stats Sidebar -->
-      <div class="col-md-4">
+      <div class="col-md-4 mt-4">
         <div class="card">
           <div class="card-header">
             <h5>📊 Quick Stats</h5>
           </div>
-          <div class="card-body">
+          <div class="card-body text-white">
             <p><strong>Total Students:</strong> <%= students.length %></p>
             <p><strong>Total Achievements:</strong> <%= achievements.length %></p>
             
@@ -277,7 +277,7 @@
     <div class="card-header">
       <h5>Achievement Stats</h5>
     </div>
-    <div class="card-body">
+    <div class="card-body text-white">
       <% achievements.forEach(achievement => { %>
         <div class="mb-2">
           <strong><%= achievement.title %></strong><br>
@@ -348,7 +348,7 @@
                   <label class="form-label">Number of Students</label>
                   <input type="number" id="bulkCount" class="form-control" value="5" min="1" max="50">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mt-4">
                   <label class="form-label">Theme</label>
                   <select id="bulkTheme" class="form-select">
                     <option value="space">Space</option>
@@ -357,7 +357,7 @@
                   </select>
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
-                  <button type="submit" class="btn btn-info w-100">Create Students</button>
+                  <button type="submit" class="btn btn-info w-100 mb-1">Create Students</button>
                 </div>
               </div>
             </form>
@@ -371,11 +371,25 @@
             <h5>⚠️ Danger Zone</h5>
           </div>
           <div class="card-body">
-            <button class="btn btn-outline-danger w-100 mb-2" onclick="confirmResetAllProgress()">
-              Reset All Progress
-            </button>
-            <small class="text-muted">This will remove all achievements from all students but keep the students.</small>
-          </div>
+  <button class="btn btn-outline-danger w-100 mb-2" onclick="confirmResetAllProgress()">
+    Reset All Progress
+  </button>
+  <small class="text-muted">This will remove all achievements from all students but keep the students.</small>
+  
+  <hr>
+
+  <button class="btn btn-outline-primary w-100 mb-2" onclick="exportPINs()">
+    Export Plaintext PINs
+  </button>
+  <small class="text-muted d-block mb-3">Downloads a JSON file of all current plaintext PINs for one-time admin export.</small>
+  
+  <button class="btn btn-outline-warning w-100" onclick="clearPINs()">
+    Clear Plaintext PINs
+  </button>
+  <small class="text-muted d-block mt-1">Deletes the plaintext PINs file. This action is irreversible.</small>
+</div>
+
+
         </div>
       </div>
     </div>
@@ -574,6 +588,42 @@
         }
       }
     }
+    async function exportPINs() {
+  if (!confirm('Export all plaintext PINs? This will download a JSON file containing sensitive data.')) return;
+
+  try {
+    const response = await fetch('/admin/export-pins');
+    if (!response.ok) throw new Error('Failed to export PINs.');
+
+    const data = await response.json();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'plaintext-pins.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert('Error exporting PINs: ' + err.message);
+  }
+}
+
+async function clearPINs() {
+  if (!confirm('Are you sure you want to CLEAR all plaintext PINs? This cannot be undone.')) return;
+
+  try {
+    const response = await fetch('/admin/clear-pins', { method: 'POST' });
+    if (!response.ok) throw new Error('Failed to clear PINs.');
+
+    alert('Plaintext PINs cleared successfully.');
+  } catch (err) {
+    alert('Error clearing PINs: ' + err.message);
+  }
+}
+
   </script>
+  
 </body>
 </html>

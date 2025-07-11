@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
@@ -9,12 +11,18 @@ const app = express();
 const PORT = 3000;
 
 // Session configuration
+app.set('trust proxy', 1);
+
 app.use(session({
-  secret: 'your-secret-key-change-this-in-production',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+  cookie: { 
+    secure: true, // HTTPS only - good for prod behind Cloudflare
+    maxAge: 24 * 60 * 60 * 1000
+  }
 }));
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -59,8 +67,8 @@ function loadJSON(filePath) {
       } else if (filePath.includes('admin.json')) {
         // Default admin credentials (admin/admin123)
         const defaultAdmin = {
-          username: "admin",
-          password: bcrypt.hashSync("admin123", 10)
+          username: process.env.DEFAULT_ADMIN,
+          password: bcrypt.hashSync(process.env.DEFAULT_CREDS, 10)
         };
         fs.writeFileSync(filePath, JSON.stringify(defaultAdmin, null, 2));
       }
@@ -149,8 +157,11 @@ app.post("/login", (req, res) => {
   const students = loadJSON(studentsPath);
   const achievements = loadJSON(achievementsPath);
 
-  const student = students.find(s => s.pseudonym === pseudonym && s.pin === pin);
-  if (!student) {
+  // Find student by pseudonym only
+  const student = students.find(s => s.pseudonym === pseudonym);
+  
+  // If no student or PIN doesn't match hashed PIN, fail
+  if (!student || !bcrypt.compareSync(pin, student.pin)) {
     const teamScores = {};
     students.forEach(s => {
       const studentPoints = (s.unlocked || []).reduce((sum, id) => {
@@ -163,13 +174,13 @@ app.post("/login", (req, res) => {
     return res.render("login", { error: "Invalid pseudonym or PIN", teamScores });
   }
 
+  // rest of your existing logic for a successful login:
   const unlocked = student.unlocked || [];
   const totalPoints = unlocked.reduce((sum, id) => {
     const ach = achievements.find(a => a.id === id);
     return sum + (ach?.points || 0);
   }, 0);
 
-  // Sort achievements: unlocked first
   achievements.sort((a, b) => {
     const aUnlocked = unlocked.includes(a.id);
     const bUnlocked = unlocked.includes(b.id);
@@ -185,6 +196,7 @@ app.post("/login", (req, res) => {
     studentData: student
   });
 });
+
 
 // Admin login routes
 app.get("/admin-login", (req, res) => {
@@ -286,7 +298,18 @@ app.post("/admin", requireAdmin, (req, res) => {
   res.redirect("/admin?pseudonym=" + pseudonym);
 });
 
-// Student management routes
+const plainPinsPath = path.join(__dirname, "data", "plainpins.json");
+
+// Add this helper function somewhere near the top of your file (outside routes)
+function savePlainPIN(pseudonym, pin) {
+  const current = fs.existsSync(plainPinsPath)
+    ? JSON.parse(fs.readFileSync(plainPinsPath, "utf8"))
+    : [];
+
+  current.push({ pseudonym, pin });
+  fs.writeFileSync(plainPinsPath, JSON.stringify(current, null, 2));
+}
+
 app.post("/admin/add-student", requireAdmin, (req, res) => {
   const students = loadJSON(studentsPath);
   const { pseudonym, pin, team, customPseudonym } = req.body;
@@ -301,9 +324,15 @@ app.post("/admin/add-student", requireAdmin, (req, res) => {
     return res.json({ success: false, error: "Pseudonym already exists" });
   }
 
+  // Save the plain PIN for admin export before hashing
+  savePlainPIN(finalPseudonym, finalPIN);
+
+  // Hash the PIN before saving it with the student object
+  const hashedPIN = bcrypt.hashSync(finalPIN, 10);
+
   const newStudent = {
     pseudonym: finalPseudonym,
-    pin: finalPIN,
+    pin: hashedPIN,    // store the hashed PIN now
     team: finalTeam,
     unlocked: [],
     dateAdded: new Date().toISOString()
@@ -378,6 +407,27 @@ app.get("/api/generate-pseudonym", requireAdmin, (req, res) => {
 app.get("/api/generate-pin", requireAdmin, (req, res) => {
   res.json({ pin: generatePIN() });
 });
+
+app.get("/admin/export-pins", requireAdmin, (req, res) => {
+  if (fs.existsSync(plainPinsPath)) {
+    res.download(plainPinsPath, "crew-pins.json", (err) => {
+      if (err) {
+        console.error("Error sending plainPins JSON:", err);
+        res.status(500).send("Failed to download file");
+      }
+    });
+  } else {
+    res.status(404).send("No pins file found");
+  }
+});
+
+app.get("/admin/clear-pins", requireAdmin, (req, res) => {
+  if (fs.existsSync(plainPinsPath)) {
+    fs.unlinkSync(plainPinsPath);
+  }
+  res.redirect("/admin"); // or show a confirmation
+});
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Crew Achievements Server running on http://localhost:${PORT}`);
