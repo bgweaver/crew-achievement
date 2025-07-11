@@ -157,10 +157,8 @@ app.post("/login", (req, res) => {
   const students = loadJSON(studentsPath);
   const achievements = loadJSON(achievementsPath);
 
-  // Find student by pseudonym only
   const student = students.find(s => s.pseudonym === pseudonym);
-  
-  // If no student or PIN doesn't match hashed PIN, fail
+
   if (!student || !bcrypt.compareSync(pin, student.pin)) {
     const teamScores = {};
     students.forEach(s => {
@@ -174,7 +172,6 @@ app.post("/login", (req, res) => {
     return res.render("login", { error: "Invalid pseudonym or PIN", teamScores });
   }
 
-  // rest of your existing logic for a successful login:
   const unlocked = student.unlocked || [];
   const totalPoints = unlocked.reduce((sum, id) => {
     const ach = achievements.find(a => a.id === id);
@@ -187,15 +184,34 @@ app.post("/login", (req, res) => {
     return (aUnlocked === bUnlocked) ? 0 : aUnlocked ? -1 : 1;
   });
 
+  // FIX: Better logic for detecting new achievements
+  const lastLogin = student.lastLogin ? new Date(student.lastLogin) : new Date(0);
+  const currentLogin = new Date();
+  
+  // Find achievements that were granted since last login
+  const newlyUnlocked = unlocked.filter(id => {
+    // Check if this achievement was granted since last login
+    // We need to track when each achievement was granted to the student
+    if (!student.achievementDates) return false;
+    const grantedDate = student.achievementDates[id];
+    return grantedDate && new Date(grantedDate) > lastLogin;
+  });
+
+  // Update last login time
+  student.lastLogin = currentLogin.toISOString();
+  saveJSON(studentsPath, students);
+
   res.render("dashboard", { 
     pseudonym, 
     achievements, 
     unlocked, 
     totalPoints,
     team: student.team,
-    studentData: student
+    studentData: student,
+    newlyUnlocked
   });
 });
+
 
 
 // Admin login routes
@@ -273,13 +289,17 @@ app.post("/admin", requireAdmin, (req, res) => {
   // Bulk assign mode
   if (req.body.bulkAssign) {
     const { achievementId, team } = req.body;
+    const currentTime = new Date().toISOString();
 
     students.forEach(s => {
       const matchTeam = team === "All" || s.team === team;
       if (matchTeam) {
         if (!s.unlocked) s.unlocked = [];
+        if (!s.achievementDates) s.achievementDates = {};
+        
         if (!s.unlocked.includes(achievementId)) {
           s.unlocked.push(achievementId);
+          s.achievementDates[achievementId] = currentTime; // Track when granted
         }
       }
     });
@@ -292,23 +312,24 @@ app.post("/admin", requireAdmin, (req, res) => {
   const { pseudonym, unlocked = [] } = req.body;
   const student = students.find(s => s.pseudonym === pseudonym);
   if (student) {
-    student.unlocked = Array.isArray(unlocked) ? unlocked : [unlocked];
+    const currentTime = new Date().toISOString();
+    const oldUnlocked = student.unlocked || [];
+    const newUnlocked = Array.isArray(unlocked) ? unlocked : [unlocked];
+    
+    if (!student.achievementDates) student.achievementDates = {};
+    
+    // Track when new achievements were granted
+    newUnlocked.forEach(id => {
+      if (!oldUnlocked.includes(id)) {
+        student.achievementDates[id] = currentTime;
+      }
+    });
+    
+    student.unlocked = newUnlocked;
     saveJSON(studentsPath, students);
   }
   res.redirect("/admin?pseudonym=" + pseudonym);
 });
-
-const plainPinsPath = path.join(__dirname, "data", "plainpins.json");
-
-// Add this helper function somewhere near the top of your file (outside routes)
-function savePlainPIN(pseudonym, pin) {
-  const current = fs.existsSync(plainPinsPath)
-    ? JSON.parse(fs.readFileSync(plainPinsPath, "utf8"))
-    : [];
-
-  current.push({ pseudonym, pin });
-  fs.writeFileSync(plainPinsPath, JSON.stringify(current, null, 2));
-}
 
 app.post("/admin/add-student", requireAdmin, (req, res) => {
   const students = loadJSON(studentsPath);
