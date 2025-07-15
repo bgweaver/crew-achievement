@@ -5,203 +5,619 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/style.css">
   <style>
-    .achievement-card {
-      transition: all 0.3s ease;
-      cursor: pointer;
+    /* Additional dashboard-specific styles */
+        .rank-display {
+      position: relative;
+      padding: 20px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
     }
-    .achievement-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+
+    .rank-badge {
+      font-size: 1rem; /* Reduced from 1.1em to match team badge */
+      padding: 0.375rem 0.75rem; /* Bootstrap badge default padding */
+      border-radius: 50px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      animation: teamGlow 2s ease-in-out infinite;
+      color: #fff;
+      display: inline-block;
+      border: none; /* Let background define the style */
     }
-    .locked {
+
+    /* Animated background border like team badges */
+    .rank-badge::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, currentColor, transparent, currentColor);
+      border-radius: 50px;
       opacity: 0.5;
-      filter: grayscale(100%);
+      z-index: -1;
+      animation: rotate 3s linear infinite;
     }
-    .unlocked {
-      border: 2px solid #28a745;
-      box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+
+    .rank-rookie {
+      background: rgba(100, 100, 100, 0.5);
+      color: #ccc;
     }
-    .progress-circle {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2em;
-      font-weight: bold;
-      margin: 0 auto 20px;
+
+    .rank-novice {
+      background: linear-gradient(135deg, var(--neon-cyan), #00ffff);
+      box-shadow: 0 0 12px var(--neon-cyan);
     }
-    .team-badge {
-      font-size: 1.1em;
-      padding: 8px 16px;
+
+    .rank-intermediate {
+      background: linear-gradient(135deg, var(--neon-green), #39ff14);
+      box-shadow: 0 0 12px var(--neon-green);
     }
-    #achievement-pop {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
-      z-index: 2000;
-      background: rgba(33, 37, 41, 0.95);
-      color: white;
-      padding: 2rem 3rem;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+
+    .rank-advanced {
+      background: linear-gradient(135deg, var(--space-accent), #5599ff);
+      box-shadow: 0 0 12px var(--space-accent);
+    }
+
+    .rank-elite {
+      background: linear-gradient(135deg, #ffd700, #ffcc00);
+      box-shadow: 0 0 14px #ffd700;
+      font-weight: 700;
+    }
+
+
+
+
+
+
+    .achievement-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .achievement-progress {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 10px;
+      position: relative;
+    }
+
+    .achievement-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--space-accent));
+      border-radius: 5px;
+      transition: width 1s ease;
+      box-shadow: 0 0 10px currentColor;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .achievement-progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: progressShine 2s linear infinite;
+    }
+
+    @keyframes progressShine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .welcome-message {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
       opacity: 0;
-      transition: all 0.3s ease;
-      pointer-events: none;
+      animation: fadeInUp 1s ease forwards;
     }
 
-    #achievement-pop.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    #achievement-pop .subtitle {
-      font-size: 1rem;
-      font-weight: normal;
-      margin-top: 0.5rem;
+    .power-meter {
+      width: 100%;
+      height: 30px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(75, 110, 245, 0.5);
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      margin: 20px 0;
+    }
+
+    .power-meter-fill {
+      height: 100%;
+      background: linear-gradient(90deg, 
+        var(--neon-green) 0%, 
+        var(--neon-cyan) 50%, 
+        var(--space-accent) 100%);
+      transition: width 1s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .power-meter-fill::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.3);
+      animation: powerScan 2s linear infinite;
+    }
+
+    @keyframes powerScan {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .crew-id {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      color: var(--neon-cyan);
+      letter-spacing: 2px;
+      margin-bottom: 20px;
       opacity: 0.8;
     }
+
+    /* Add padding for fixed space facts bar */
+    body {
+      padding-bottom: 80px;
+    }
+
+    .space-facts {
+      padding: 15px 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-style: italic;
+      z-index: 100;
+    }
+
+    .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.stat-card {
+  background: rgba(20, 20, 40, 0.7);
+  border-radius: 12px;
+  padding: 15px 20px;
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px var(--neon-cyan);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: scale(1.05);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-top: 8px;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.progress-circle-svg {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
+.progress-circle-svg svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.progress-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.progress-fill {
+  fill: none;
+  stroke: var(--neon-cyan, #00ffff);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 314;
+  stroke-dashoffset: 314;
+  transition: stroke-dashoffset 1s ease;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.6)); /* Reduced from 10px to 4px, added alpha */
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--neon-cyan, #00ffff);
+  text-shadow: 0 0 6px rgba(0, 255, 255, 0.8); /* Reduced from 10px to 6px, added alpha */
+  font-family: 'Orbitron', monospace;
+}
+
+.progress-circle-svg.complete .progress-fill {
+  stroke: var(--neon-green, #39ff14);
+  filter: drop-shadow(0 0 6px rgba(57, 255, 20, 0.7)); /* Reduced and added alpha */
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.progress-circle-svg.complete .progress-text {
+  color: var(--neon-green, #39ff14);
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.8); /* Reduced and added alpha */
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
   </style>
 </head>
 <body class="container mt-5">
+  <!-- Particle effects -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Main content -->
   <div class="row mb-4">
     <div class="col-md-8">
-      <h1>🚀 Welcome back, <%= pseudonym %>!</h1>
-      <p class="lead">
-        <span class="badge team-badge mt-2 bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %>">
-          <%= team %> Team
-        </span>
-      </p>
+      <div class="welcome-message">
+        <h1>🚀 Welcome back, <%= pseudonym %>!</h1>
+        <p class="lead">
+  <span class="badge team-badge mt-2 bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %>">
+    <%= team %> Squadron
+  </span class="mt-2">
+  <% 
+    const progress = unlocked.length / achievements.length;
+    let rank = 'Rookie';
+    let rankClass = 'rank-rookie';
+    if (progress === 1) { rank = 'Elite'; rankClass = 'rank-elite'; }
+    else if (progress >= 0.75) { rank = 'Advanced'; rankClass = 'rank-advanced'; }
+    else if (progress >= 0.5) { rank = 'Intermediate'; rankClass = 'rank-intermediate'; }
+    else if (progress >= 0.25) { rank = 'Novice'; rankClass = 'rank-novice'; }
+  %>
+  <span class="badge rank-badge mt-2 <%= rankClass %>">
+    <%= rank %> Pilot
+  </span>
+</p>
+      </div>
     </div>
     <div class="col-md-4 text-end">
-      <div class="progress-circle bg-<%= unlocked.length === achievements.length ? 'success' : 'light' %> text-<%= unlocked.length === achievements.length ? 'white' : 'dark' %>">
-        <%= Math.round((unlocked.length / achievements.length) * 100) %>%
+      <div class="progress-circle-svg" id="progressCircle">
+  <svg>
+    <circle class="progress-bg" cx="60" cy="60" r="50"></circle>
+    <circle class="progress-fill" cx="60" cy="60" r="50"></circle>
+  </svg>
+  <div class="progress-text"><%= unlocked && achievements && achievements.length > 0 ? Math.round((unlocked.length / achievements.length) * 100) : 0 %>%</div>
+</div>
+    </div>
+  </div>
+
+  <!-- Rank Display -->
+  
+  </div>
+
+  <!-- Mission Status -->
+  <div class="mission-status">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h5>Current Mission Progress</h5>
+        <p class="mb-1">Complete all achievements to reach Elite status!</p>
+        <div class="achievement-progress">
+          <div class="achievement-progress-bar" style="width: <%= unlocked && achievements && achievements.length > 0 ? Math.round((unlocked.length / achievements.length) * 100) : 0 %>%"></div>
+        </div>
+      </div>
+      <div class="col-md-4 text-end">
+        <% if (unlocked.length === achievements.length) { %>
+          <span class="badge bg-success p-3">MISSION COMPLETE! 🎉</span>
+        <% } else { %>
+          <span class="badge bg-info p-3"><%= achievements.length - unlocked.length %> REMAINING</span>
+        <% } %>
       </div>
     </div>
   </div>
 
-  <div class="row mb-4">
-    <div class="col-md-4">
-      <div class="card text-center">
-        <div class="card-body">
-          <h5 class="card-title">Total Points</h5>
-          <h2 class="text-primary"><%= totalPoints %></h2>
-        </div>
-      </div>
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Points</div>
+      <div class="stat-value"><%= totalPoints %></div>
+      <div class="stat-label">⚡ Power Level</div>
     </div>
-    <div class="col-md-4">
-      <div class="card text-center">
-        <div class="card-body">
-          <h5 class="card-title">Achievements</h5>
-          <h2 class="<%= unlocked.length === achievements.length ? 'text-success' : 'text-warning' %>">
-            <%= unlocked.length %> / <%= achievements.length %>
-          </h2>
-        </div>
-      </div>
+    <div class="stat-card">
+      <div class="stat-label">Achievements</div>
+      <div class="stat-value"><%= unlocked.length %>/<%= achievements.length %></div>
+      <div class="stat-label">🏆 Collected</div>
     </div>
-    <div class="col-md-4">
-      <div class="card text-center">
-        <div class="card-body">
-          <h5 class="card-title">Rank</h5>
-          <h2 class="text-info">
-            <%= unlocked.length === achievements.length ? 'Elite' : 
-                unlocked.length >= achievements.length * 0.75 ? 'Advanced' :
-                unlocked.length >= achievements.length * 0.5 ? 'Intermediate' :
-                unlocked.length >= achievements.length * 0.25 ? 'Novice' : 'Rookie' %>
-          </h2>
-        </div>
-      </div>
+    <div class="stat-card">
+      <div class="stat-label">Squadron Rank</div>
+      <div class="stat-value">#<%= Math.floor(Math.random() * 10) + 1 %></div>
+      <div class="stat-label">📊 In <%= team %> Team</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-label">Days Active</div>
+      <div class="stat-value"><%= Math.floor(Math.random() * 50) + 10 %></div>
+      <div class="stat-label">🗓️ Mission Time</div>
+    </div>
+  </div>
+
+  <!-- Power Meter -->
+  <div class="power-meter">
+    <div class="power-meter-fill" style="width: <%= Math.min(100, (totalPoints / 10)) %>%"></div>
   </div>
 
   <% if (unlocked.length === achievements.length) { %>
-    <div class="alert alert-success text-center mb-4">
-      <h4>🎉 Congratulations! 🎉</h4>
-      <p>You've unlocked all achievements! You're a true crew elite!</p>
+    <div class="alert alert-success text-center mb-4" style="background: linear-gradient(135deg, rgba(40, 199, 111, 0.9), rgba(34, 197, 94, 0.9)); border: 2px solid var(--success); animation: eliteShine 2s ease-in-out infinite;">
+      <h4>🎉 LEGENDARY STATUS ACHIEVED! 🎉</h4>
+      <p>You've unlocked all achievements and reached Elite rank! You're a true space pioneer!</p>
     </div>
   <% } %>
 
-  <div class="row">
+  <!-- Achievements Grid -->
+  <h2 class="mb-4">🎯 Mission Objectives</h2>
+  <div class="achievement-grid">
     <% achievements.forEach(a => { %>
-      <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card achievement-card <%= unlocked.includes(a.id) ? 'unlocked' : 'locked' %>" data-ach-id="<%= a.id %>">
-          <div class="position-relative">
-            <img src="<%= a.image %>" class="card-img-top" alt="Achievement" style="height: 200px; object-fit: cover;">
-            <% if (unlocked.includes(a.id)) { %>
-              <div class="position-absolute top-0 end-0 p-2">
-                <span class="badge bg-success">✓ Unlocked</span>
-              </div>
-            <% } else { %>
-              <div class="position-absolute top-0 end-0 p-2">
-                <span class="badge bg-secondary">🔒 Locked</span>
-              </div>
-            <% } %>
-          </div>
-          <div class="card-body">
-            <h5 class="card-title"><%= a.title %></h5>
-            <p class="card-text"><%= a.description %></p>
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="badge bg-<%= unlocked.includes(a.id) ? 'success' : 'secondary' %> fs-6">
-                <%= a.points %> pts
-              </span>
-              <% if (unlocked.includes(a.id)) { %>
-                <small class="text-success">🌟 Earned!</small>
-              <% } else { %>
-                <small class="text-muted">Keep going!</small>
-              <% } %>
+      <div class="card achievement-card <%= unlocked.includes(a.id) ? 'unlocked' : 'locked' %>" data-ach-id="<%= a.id %>">
+        <div class="position-relative">
+          <img src="<%= a.image %>" class="card-img-top" alt="Achievement" style="height: 200px; object-fit: cover; filter: <%= unlocked.includes(a.id) ? 'none' : 'grayscale(100%) brightness(50%)' %>;">
+          <% if (unlocked.includes(a.id)) { %>
+            <div class="position-absolute top-0 end-0 p-2">
+              <span class="badge bg-success">✓ COMPLETE</span>
             </div>
+          <% } else { %>
+            <div class="position-absolute top-0 end-0 p-2">
+              <span class="badge bg-secondary">🔒 LOCKED</span>
+            </div>
+          <% } %>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title"><%= a.title %></h5>
+          <p class="card-text"><%= a.description %></p>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="badge bg-<%= unlocked.includes(a.id) ? 'success' : 'secondary' %> fs-6">
+              <%= a.points %> pts
+            </span>
+            <% if (unlocked.includes(a.id)) { %>
+              <small class="text-success">🌟 Earned!</small>
+            <% } else { %>
+              <small class="text-muted">Keep going!</small>
+            <% } %>
           </div>
         </div>
       </div>
     <% }) %>
   </div>
 
-  <div class="text-center mt-4">
-    <a href="/" class="btn btn-outline-primary">← Back to Login</a>
+  <div class="text-center mt-5 mb-4">
+    <a href="/" class="btn btn-outline-primary">← Return to Base</a>
   </div>
   
   <div id="achievement-pop"></div>
 
+  <!-- Space facts bar -->
+  <div class="space-facts" id="spaceFacts">
+    Loading cosmic wisdom...
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Add some fun interactions
+    // Space facts for the dashboard
+    const spaceFacts = [
+      "Keep pushing, <%= pseudonym %>! You're <%= Math.round((unlocked.length / achievements.length) * 100) %>% of the way to Elite status!",
+      "Your <%= team %> Squadron is counting on you!",
+      "Fun fact: Astronauts grow up to 2 inches taller in space!",
+      "Remember: In space, teamwork isn't just important—it's essential for survival!",
+      "Did you know? The International Space Station travels at 17,500 mph!",
+      "Space tip: Every small achievement adds up to something stellar!",
+      "The universe is 13.8 billion years old, but your journey is just beginning!",
+      "Cosmic wisdom: The best pilots never stop learning!",
+      "<%= rank %> pilots like you are the future of space exploration!",
+      "Achievement unlocked: Being awesome! Keep it up!"
+    ];
+
+    let factIndex = 0;
+    function rotateFacts() {
+      const factElement = document.getElementById('spaceFacts');
+      factElement.style.transition = 'opacity 0.5s';
+      factElement.style.opacity = '0';
+      
+      setTimeout(() => {
+        factElement.textContent = spaceFacts[factIndex];
+        factElement.style.opacity = '1';
+        factIndex = (factIndex + 1) % spaceFacts.length;
+      }, 500);
+    }
+
+    // Start rotating facts
+    rotateFacts();
+    setInterval(rotateFacts, 8000);
+
+    // Create particle effects
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * window.innerWidth + 'px';
+      particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
+      particle.style.animationDelay = Math.random() * 5 + 's';
+      document.getElementById('particles').appendChild(particle);
+      
+      setTimeout(() => particle.remove(), 15000);
+    }
+
+    // Create particles periodically
+    setInterval(createParticle, 500);
+
+    // Achievement card interactions
     document.querySelectorAll('.achievement-card').forEach(card => {
       card.addEventListener('click', function() {
         if (this.classList.contains('unlocked')) {
-          // Add a celebration effect
-          this.style.transform = 'scale(1.05)';
+          // Celebration effect
+          this.style.transform = 'scale(1.05) rotateY(360deg)';
           setTimeout(() => {
             this.style.transform = '';
-          }, 200);
+          }, 600);
+          
+          // Create sparkles
+          for(let i = 0; i < 5; i++) {
+            setTimeout(() => createSparkle(this), i * 100);
+          }
+        } else {
+          // Shake effect for locked
+          this.style.animation = 'shake 0.5s';
+          setTimeout(() => {
+            this.style.animation = '';
+          }, 500);
         }
       });
     });
+
+    // Shake animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Create sparkle effect
+    function createSparkle(element) {
+      const sparkle = document.createElement('div');
+      sparkle.style.position = 'absolute';
+      sparkle.style.width = '10px';
+      sparkle.style.height = '10px';
+      sparkle.style.background = '#ffd700';
+      sparkle.style.borderRadius = '50%';
+      sparkle.style.pointerEvents = 'none';
+      sparkle.style.zIndex = '1000';
+      
+      const rect = element.getBoundingClientRect();
+      sparkle.style.left = rect.left + rect.width / 2 + 'px';
+      sparkle.style.top = rect.top + rect.height / 2 + 'px';
+      
+      document.body.appendChild(sparkle);
+      
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 50 + Math.random() * 50;
+      
+      sparkle.animate([
+        { 
+          transform: 'translate(-50%, -50%) scale(1)',
+          opacity: 1 
+        },
+        { 
+          transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+          opacity: 0 
+        }
+      ], {
+        duration: 1000,
+        easing: 'ease-out'
+      }).onfinish = () => sparkle.remove();
+    }
 
     // Achievement popup logic
     const newAchievements = <%- JSON.stringify(newlyUnlocked || []) %>;
     const achievements = <%- JSON.stringify(achievements) %>;
 
-    // Debug logging
-    console.log('New achievements:', newAchievements);
-    console.log('All achievements:', achievements);
-
     function showBigToast(title, index) {
       console.log('Showing popup for:', title);
       const pop = document.getElementById("achievement-pop");
-      pop.innerHTML = `🏆 Achievement Unlocked<br><span class="subtitle">${title}</span>`;
+      pop.innerHTML = `🏆 ACHIEVEMENT UNLOCKED<br><span class="subtitle">${title}</span>`;
       pop.classList.add("show");
+      
+      // Play a sound effect (if you add one)
+      // const audio = new Audio('/sounds/achievement.mp3');
+      // audio.play();
+      
+      // Create confetti effect
+      createConfetti();
       
       setTimeout(() => {
         pop.classList.remove("show");
       }, 3000);
     }
 
-    // Show popups immediately when page loads
+    // Create confetti effect
+    function createConfetti() {
+      const colors = ['#ff006e', '#00ffff', '#39ff14', '#ffd700', '#ff00ff'];
+      for(let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.style.position = 'fixed';
+          confetti.style.width = '10px';
+          confetti.style.height = '10px';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.left = '50%';
+          confetti.style.top = '50%';
+          confetti.style.zIndex = '2001';
+          confetti.style.pointerEvents = 'none';
+          document.body.appendChild(confetti);
+          
+          const angle = (Math.PI * 2 * i) / 50;
+          const velocity = 200 + Math.random() * 200;
+          const gravity = 1000;
+          
+          confetti.animate([
+            { 
+              transform: 'translate(-50%, -50%) rotate(0deg)',
+              opacity: 1 
+            },
+            { 
+              transform: `translate(${Math.cos(angle) * velocity}px, ${Math.sin(angle) * velocity - gravity}px) rotate(720deg)`,
+              opacity: 0 
+            }
+          ], {
+            duration: 2000,
+            easing: 'cubic-bezier(.25,.46,.45,.94)'
+          }).onfinish = () => confetti.remove();
+        }, i * 20);
+      }
+    }
+
+    // Show popups for new achievements
     if (newAchievements.length > 0) {
       console.log('Found new achievements, showing popups...');
       newAchievements.forEach((id, index) => {
@@ -215,9 +631,122 @@
           }
         }, index * 4000);
       });
-    } else {
-      console.log('No new achievements to show');
     }
+
+    // Add hover sound effects (optional)
+    document.querySelectorAll('.btn, .achievement-card').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        // Add hover sound here if desired
+      });
+    });
+
+    // Progress circle animation on load
+    setTimeout(() => {
+      const progressCircle = document.querySelector('.progress-circle');
+      if (progressCircle) {
+        progressCircle.style.transition = 'all 1s ease';
+        progressCircle.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+          progressCircle.style.transform = 'scale(1)';
+        }, 300);
+      }
+    }, 500);
+
+    // Animate stats on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all stat cards
+    document.querySelectorAll('.stat-card').forEach((card, index) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = `all 0.5s ease ${index * 0.1}s`;
+      observer.observe(card);
+    });
+
+    // Add floating animation to badges
+    document.querySelectorAll('.badge').forEach((badge, index) => {
+      badge.style.animation = `float ${3 + index * 0.5}s ease-in-out infinite`;
+      badge.style.animationDelay = `${index * 0.2}s`;
+    });
+
+    // Create floating stars effect in background
+    function createBackgroundStar() {
+      const star = document.createElement('div');
+      star.style.position = 'fixed';
+      star.style.width = '2px';
+      star.style.height = '2px';
+      star.style.background = '#fff';
+      star.style.borderRadius = '50%';
+      star.style.pointerEvents = 'none';
+      star.style.zIndex = '-1';
+      star.style.left = Math.random() * window.innerWidth + 'px';
+      star.style.top = '-10px';
+      star.style.opacity = Math.random() * 0.8 + 0.2;
+      
+      document.body.appendChild(star);
+      
+      const duration = Math.random() * 10000 + 10000;
+      const horizontalMovement = (Math.random() - 0.5) * 100;
+      
+      star.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: star.style.opacity },
+        { transform: `translateY(${window.innerHeight + 20}px) translateX(${horizontalMovement}px)`, opacity: '0' }
+      ], {
+        duration: duration,
+        easing: 'linear'
+      }).onfinish = () => star.remove();
+    }
+
+    // Create background stars periodically
+    setInterval(createBackgroundStar, 300);
+
+    function updateProgressCircle() {
+  const unlockedCount = <%= unlocked ? unlocked.length : 0 %>;
+  const totalCount = <%= achievements ? achievements.length : 1 %>;
+  const percentage = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+  
+  console.log(`Progress: ${unlockedCount}/${totalCount} = ${percentage}%`);
+  
+  const progressFill = document.querySelector('.progress-fill');
+  const progressText = document.querySelector('.progress-text');
+  const progressCircle = document.querySelector('.progress-circle-svg');
+  
+  if (progressFill && progressText) {
+    // Calculate stroke-dashoffset
+    const circumference = 314; // 2π * 50
+    const offset = circumference - (circumference * percentage) / 100;
+    
+    console.log(`Setting offset to: ${offset}`);
+    
+    // Update the progress fill
+    progressFill.style.strokeDashoffset = offset;
+    
+    // Update text
+    progressText.textContent = percentage + '%';
+    
+    // Add complete class if 100%
+    if (percentage === 100) {
+      progressCircle.classList.add('complete');
+    }
+  } else {
+    console.error('Progress circle elements not found');
+  }
+}
+
+// Call this function when the page loads
+setTimeout(updateProgressCircle, 1000);
   </script>
 </body>
 </html>

@@ -1,53 +1,425 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Valiant Inquiry - Login</title>
+  <title>Valiant Inquiry - Space Station Login</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/style.css">
+  <style>
+    /* Enhanced Space Theme CSS - Ultra Cool Edition */
+    /* Root variables for consistent theming */
+    :root {
+      --space-dark: #0a0a1a;
+      --space-medium: #1a1a40;
+      --space-light: #2e2e6e;
+      --space-accent: #4b6ef5;
+      --space-secondary: #6c5ce7;
+      --space-gold: #ffd700;
+      --space-silver: #c0c0c0;
+      --space-bronze: #cd7f32;
+      --text-primary: #ffffff;
+      --text-secondary: #e0e0f0;
+      --text-muted: #a0a0c0;
+      --success: #28c76f;
+      --warning: #ff9f43;
+      --danger: #ea5455;
+      --info: #00cfe8;
+      --glow: 0 0 20px rgba(75, 110, 245, 0.3);
+      --glow-strong: 0 0 30px rgba(75, 110, 245, 0.5);
+      --neon-pink: #ff006e;
+      --neon-cyan: #00ffff;
+      --neon-green: #39ff14;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--space-dark) 0%, var(--space-medium) 50%, var(--space-light) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Login container styling */
+    .login-container {
+      background: rgba(46, 46, 110, 0.4);
+      border: 2px solid var(--space-accent);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--glow-strong);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-control {
+      background: rgba(26, 26, 64, 0.8);
+      border: 2px solid var(--space-accent);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      padding: 15px 20px;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      background: rgba(26, 26, 64, 0.9);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+      color: var(--text-primary);
+    }
+
+    .form-control::placeholder {
+      color: var(--text-muted);
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, var(--space-accent), var(--space-secondary));
+      border: none;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 15px 30px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: var(--glow);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(45deg, var(--space-secondary), var(--space-accent));
+      box-shadow: var(--glow-strong);
+      transform: translateY(-2px);
+    }
+
+    .team-standings {
+      background: rgba(46, 46, 110, 0.3);
+      border: 2px solid var(--space-accent);
+      border-radius: 15px;
+      backdrop-filter: blur(5px);
+      box-shadow: var(--glow);
+    }
+
+    .team-item {
+      background: rgba(26, 26, 64, 0.6);
+      border: 1px solid var(--space-light);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .team-item:hover {
+      background: rgba(26, 26, 64, 0.8);
+      transform: translateX(5px);
+      box-shadow: var(--glow);
+    }
+
+    /* Additional login-specific styles */
+    .space-station-title {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--text-primary);
+      text-shadow: 
+        0 0 20px rgba(75, 110, 245, 0.8),
+        0 0 40px rgba(0, 255, 255, 0.5),
+        0 0 60px rgba(255, 0, 110, 0.3);
+      animation: titleGlow 3s ease-in-out infinite;
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+    }
+
+    @keyframes titleGlow {
+      0%, 100% { 
+        text-shadow: 
+          0 0 20px rgba(75, 110, 245, 0.8),
+          0 0 40px rgba(0, 255, 255, 0.5),
+          0 0 60px rgba(255, 0, 110, 0.3);
+      }
+      50% { 
+        text-shadow: 
+          0 0 30px rgba(75, 110, 245, 1),
+          0 0 50px rgba(0, 255, 255, 0.7),
+          0 0 70px rgba(255, 0, 110, 0.5);
+      }
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan);
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+      animation: subtitlePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes subtitlePulse {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+
+    .login-form {
+      position: relative;
+      padding-top: 50px;
+    }
+
+    .auth-required {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--warning);
+      letter-spacing: 3px;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px var(--warning);
+      animation: blink 1s ease-in-out infinite;
+      white-space: nowrap;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .space-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(75, 110, 245, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(75, 110, 245, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: -3;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    .planet {
+      position: fixed;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      z-index: -2;
+      overflow: hidden;
+    }
+
+    .planet-1 {
+      top: 10%;
+      right: 10%;
+      background: radial-gradient(circle at 30% 30%, var(--space-accent), var(--space-dark));
+      box-shadow: 
+        0 0 50px rgba(75, 110, 245, 0.5),
+        inset -20px -20px 40px rgba(0, 0, 0, 0.5);
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .planet-2 {
+      bottom: 10%;
+      left: 5%;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle at 40% 40%, var(--neon-pink), var(--space-dark));
+      box-shadow: 
+        0 0 40px rgba(255, 0, 110, 0.5),
+        inset -15px -15px 30px rgba(0, 0, 0, 0.5);
+      animation: float 25s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .team-preview {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .team-card {
+      background: rgba(46, 46, 110, 0.6);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .team-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, currentColor, transparent);
+      opacity: 0.1;
+      animation: teamPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes teamPulse {
+      0%, 100% { transform: scale(0.8); }
+      50% { transform: scale(1.2); }
+    }
+
+    .team-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .team-red { border-color: #ff0040; color: #ff0040; }
+    .team-blue { border-color: #0080ff; color: #0080ff; }
+    .team-green { border-color: #00ff40; color: #00ff40; }
+    .team-yellow { border-color: #ffff00; color: #ffff00; }
+
+    .team-red:hover { box-shadow: 0 10px 30px rgba(255, 0, 64, 0.5); }
+    .team-blue:hover { box-shadow: 0 10px 30px rgba(0, 128, 255, 0.5); }
+    .team-green:hover { box-shadow: 0 10px 30px rgba(0, 255, 64, 0.5); }
+    .team-yellow:hover { box-shadow: 0 10px 30px rgba(255, 255, 0, 0.5); }
+
+    .security-scanner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+      z-index: -1;
+      animation: scan 3s linear infinite;
+    }
+
+    @keyframes scan {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(100vh); }
+    }
+
+    .hologram-effect {
+      position: relative;
+    }
+
+    .hologram-effect::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 255, 255, 0.03) 2px,
+          rgba(0, 255, 255, 0.03) 4px
+        );
+      pointer-events: none;
+      animation: hologramGlitch 5s ease-in-out infinite;
+    }
+
+    @keyframes hologramGlitch {
+      0%, 100% { opacity: 0.05; }
+      50% { opacity: 0.1; }
+    }
+
+    .space-facts {
+      padding: 15px 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-style: italic;
+      z-index: 100;
+      transition: opacity 1s ease-in-out;
+    }
+  </style>
 </head>
 <body>
+  <!-- Background effects -->
+  <div class="space-grid"></div>
+  <div class="planet planet-1"></div>
+  <div class="planet planet-2"></div>
+  <div class="security-scanner"></div>
+  
   <div class="container mt-5">
     <div class="row justify-content-center">
       <div class="col-md-8 col-lg-6">
-        <div class="login-container p-5">
-          <div class="text-center mb-4">
-            <h1 class="display-4 mb-3">S.S. Valiant Inquiry</h1>
-            <p class="lead text-muted">Welcome Back, Cadet</p>
+        <div class="login-container p-5 hologram-effect">
+          <div class="text-center mb-2">
+            <h1 class="space-station-title">S.S. VALIANT INQUIRY</h1>
+            <p class="subtitle mb-3">GALACTIC LEARNING STATION</p>
+            <div class="mb-2">
+              <small style="color: white;">Stardate: <%= new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></small>
+            </div>
           </div>
 
           <% if (error) { %>
-            <div class="alert alert-danger animate__animated animate__shakeX">
+            <div class="alert alert-danger animate__animated animate__shakeX" style="background: rgba(234, 84, 85, 0.9); border: 2px solid var(--danger);">
               <i class="fas fa-exclamation-triangle"></i> <%= error %>
             </div>
           <% } %>
 
-          <form action="/login" method="POST">
+          <form action="/login" method="POST" class="login-form">
+            <div class="auth-required">AUTHENTICATION REQUIRED</div>
             <div class="mb-4">
-              <label for="pseudonym" class="form-label fs-5">🎭 Username</label>
+              <label for="pseudonym" class="form-label fs-5">🚀 Pilot Callsign</label>
               <input type="text" class="form-control form-control-lg" id="pseudonym" name="pseudonym" required 
-                     placeholder="Enter your username">
+                     placeholder="Enter your space name" autocomplete="off">
             </div>
             <div class="mb-4">
-              <label for="pin" class="form-label fs-5">🔐 Security PIN</label>
+              <label for="pin" class="form-label fs-5">🔐 Access Code</label>
               <input type="password" class="form-control form-control-lg" id="pin" name="pin" required 
-                     placeholder="Enter your 4-digit PIN">
+                     placeholder="4-digit security PIN" maxlength="4" pattern="[0-9]{4}">
             </div>
             <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
-              🚀 Launch Mission
+              🚀 ENGAGE HYPERDRIVE
             </button>
           </form>
 
           <div class="text-center">
-            <small class="text-muted">
-              Lost your access codes? Contact your captain.<br>
-              <a href="/admin-login" class="text-decoration-none">Mission Control Access</a>
+            <small style="color: white;">
+              Lost in space? Contact Mission Control.<br>
+              <a href="/admin-login" class="text-decoration-none" style="color: var(--space-accent);">
+                🛸 Commander Access Portal
+              </a>
             </small>
           </div>
         </div>
 
         <% if (Object.keys(teamScores).length > 0) { %>
-          <div class="team-standings p-4 my-5">
-            <h3 class="text-center mb-4">🏆 Team Standings</h3>
+          <div class="team-standings p-4 mt-5 mb-3">
+            <h3 class="text-center mb-4" style="color: var(--neon-cyan); text-shadow: 0 0 20px var(--neon-cyan);">
+              🌟 SQUADRON RANKINGS 🌟
+            </h3>
+            
+            <!-- Team Preview Cards -->
+            <div class="team-preview mb-4">
+              <% 
+                const teams = ['Red', 'Blue', 'Green', 'Yellow'];
+                teams.forEach(team => { 
+                  const score = teamScores[team] || 0;
+              %>
+                <div class="team-card team-<%= team.toLowerCase() %>">
+                  <h5><%= team %></h5>
+                  <div class="fs-4 fw-bold"><%= score %></div>
+                  <small>POINTS</small>
+                </div>
+              <% }) %>
+            </div>
+            
+            <!-- Detailed Rankings -->
             <div class="list-group">
               <% 
                 const sortedTeams = Object.entries(teamScores).sort((a, b) => b[1] - a[1]);
@@ -58,7 +430,7 @@
                     <span class="badge bg-<%= index === 0 ? 'warning' : index === 1 ? 'secondary' : index === 2 ? 'info' : 'dark' %> me-2">
                       <%= index + 1 %>
                     </span>
-                    <span class="fs-5"><%= team %> Team</span>
+                    <span class="fs-5"><%= team %> Squadron</span>
                   </div>
                   <span class="badge bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %> fs-6">
                     <%= score %> pts
@@ -72,6 +444,297 @@
     </div>
   </div>
 
+  <!-- Fun space facts that rotate -->
+  <div class="space-facts mb-5 mt-3" id="spaceFacts">
+    Loading cosmic wisdom...
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Space facts to display
+    const spaceFacts = [
+  "Venus spins backwards and super slowly — one day on Venus is longer than its year.",
+  "A teaspoon of neutron star would weigh about a billion tons — no, seriously.",
+  "The Sun accounts for 99.8% of the mass in the solar system.",
+  "Jupiter is so big you could fit all the other planets inside it — and still have room left.",
+  "Saturn’s rings look solid but they’re made of billions of ice chunks, some as small as pebbles.",
+  "Mars has the tallest volcano in the solar system — Olympus Mons — nearly 3x the height of Mount Everest.",
+  "The Moon is slowly drifting away from Earth — about 1.5 inches per year.",
+  "Uranus rotates on its side — its tilt is so extreme, it basically rolls around the Sun.",
+  "Mercury has almost no atmosphere, so its surface temperature swings 1000°F between day and night.",
+  "Pluto has mountains made of ice, and it may have a subsurface ocean.",
+  "In space, metal pieces can weld together without heat — it's called cold welding.",
+  "A day on Jupiter is only about 10 hours long — fastest spinner in the solar system.",
+  "Earth is the only planet known to have plate tectonics (and life, of course).",
+  "Saturn’s moon Titan has rivers and lakes — but they’re made of liquid methane, not water.",
+  "One day on the Moon is about 29 Earth days long.",
+  "The Sun's core is about 27 million °F — it fuses 600 million tons of hydrogen every second.",
+  "The Kuiper Belt is a ring of icy objects beyond Neptune — Pluto hangs out there.",
+  "You could fit 1.3 million Earths inside the Sun.",
+  "It rains sulfuric acid on Venus — and the pressure would crush you flat.",
+  "A year on Neptune is 165 Earth years long.",
+  "The Milky Way galaxy is about 100,000 light-years across.",
+  "There’s a giant storm on Jupiter called the Great Red Spot — it’s bigger than Earth and has raged for centuries.",
+  "Astronauts can grow up to 2 inches taller in microgravity (their spines decompress).",
+  "You can’t burp in space — no gravity means gas doesn’t separate from liquids in your stomach.",
+  "The Hubble Space Telescope can see galaxies more than 13 billion light-years away.",
+  "The universe is expanding — and the farther away a galaxy is, the faster it’s moving away.",
+  "Some rogue planets just drift through space without orbiting a star.",
+  "Black holes can warp time — near the event horizon, time passes slower.",
+  "There's a huge hexagon-shaped storm at Saturn's north pole.",
+  "In 1977, we launched the Voyager probes — they’re still flying, and one has left the solar system.",
+  "Earth’s magnetic field protects us from deadly solar radiation — and creates the auroras.",
+  "Some stars explode in supernovas and create elements like gold, iron, and uranium.",
+  "There’s a comet named Halley that’s visible from Earth every 76 years — next up is 2061.",
+  "The Moon has moonquakes — some strong enough to last for 10 minutes.",
+  "The largest known star, UY Scuti, is over 1,700 times the diameter of the Sun.",
+  "If two neutron stars crash into each other, they can create a black hole — and ripples in space-time.",
+  "There’s a moon of Saturn, Enceladus, that shoots ice geysers into space — it might have an ocean beneath its crust.",
+  "Solar flares can knock out satellites and power grids on Earth.",
+  "The ISS orbits Earth every 90 minutes — astronauts see 16 sunrises and sunsets a day.",
+  "If you shouted in space, no one would hear you — there’s no air for sound to travel through.",
+  "The James Webb Space Telescope can see infrared light — basically heat — from distant galaxies.",
+  "In 2020, scientists discovered a possible radio signal from Proxima Centauri — our closest stellar neighbor.",
+  "There's a planet made of diamond (probably) — it’s called 55 Cancri e.",
+  "The early universe was just hydrogen, helium, and darkness — stars had to light things up.",
+  "Comets have tails that always point *away* from the Sun, no matter what direction they’re moving.",
+  "Some galaxies are shaped like spirals, others like blobs, and some like exploding fireworks.",
+  "The Sun flips its magnetic poles every 11 years — like a solar reset button.",
+  "Without a spacesuit, you'd die in space in less than a minute — not from cold, but from lack of pressure.",
+  "Your GPS only works because satellites constantly account for Einstein’s theory of relativity.",
+  "Mars has seasons, polar ice caps, and dust storms that can cover the whole planet.",
+  "The Moon was probably formed when something the size of Mars slammed into Earth.",
+  "It takes 225 million years for the Sun to orbit once around the Milky Way."
+];
+
+
+    let factIndex = 0;
+    function rotateFacts() {
+      const factElement = document.getElementById('spaceFacts');
+      
+      // Fade out
+      factElement.style.opacity = '0';
+      
+      setTimeout(() => {
+        // Change text while invisible
+        factElement.textContent = spaceFacts[factIndex];
+        factIndex = (factIndex + 1) % spaceFacts.length;
+        
+        // Fade back in
+        factElement.style.opacity = '0.7';
+      }, 800); // Wait for fade out to complete
+    }
+
+    // Start rotating facts
+    rotateFacts();
+    setInterval(rotateFacts, 45000);
+
+    // Create floating stars in background
+    function createFloatingStar() {
+      const star = document.createElement('div');
+      star.style.position = 'fixed';
+      star.style.width = '2px';
+      star.style.height = '2px';
+      star.style.background = '#fff';
+      star.style.borderRadius = '50%';
+      star.style.pointerEvents = 'none';
+      star.style.zIndex = '-1';
+      star.style.left = Math.random() * window.innerWidth + 'px';
+      star.style.top = '-10px';
+      star.style.opacity = Math.random() * 0.8 + 0.2;
+      
+      document.body.appendChild(star);
+      
+      const duration = Math.random() * 10000 + 10000;
+      const horizontalMovement = (Math.random() - 0.5) * 200;
+      
+      star.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: star.style.opacity },
+        { transform: `translateY(${window.innerHeight + 20}px) translateX(${horizontalMovement}px)`, opacity: '0' }
+      ], {
+        duration: duration,
+        easing: 'linear'
+      }).onfinish = () => star.remove();
+    }
+
+    // Create stars periodically
+    setInterval(createFloatingStar, 300);
+
+    // Add input effects
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = '';
+      });
+      
+      // Special effect for PIN input
+      if (input.id === 'pin') {
+        input.addEventListener('input', function() {
+          if (this.value.length === 4) {
+            this.style.borderColor = 'var(--success)';
+            this.style.boxShadow = '0 0 20px rgba(40, 199, 111, 0.5)';
+          } else {
+            this.style.borderColor = '';
+            this.style.boxShadow = '';
+          }
+        });
+      }
+    });
+
+    // Add hover sound simulation (visual feedback)
+    document.querySelector('.btn-primary').addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+    });
+
+    document.querySelector('.btn-primary').addEventListener('mouseleave', function() {
+      this.style.transform = '';
+    });
+
+    // Create constellation effect on mouse move
+    let lastX = 0, lastY = 0;
+    let mouseTrail = [];
+
+    document.addEventListener('mousemove', (e) => {
+      const distance = Math.sqrt(Math.pow(e.clientX - lastX, 2) + Math.pow(e.clientY - lastY, 2));
+      
+      if (distance > 50) {
+        createConstellation(e.clientX, e.clientY);
+        lastX = e.clientX;
+        lastY = e.clientY;
+      }
+    });
+
+    function createConstellation(x, y) {
+      const point = document.createElement('div');
+      point.style.position = 'fixed';
+      point.style.width = '4px';
+      point.style.height = '4px';
+      point.style.background = 'rgba(0, 255, 255, 0.5)';
+      point.style.borderRadius = '50%';
+      point.style.left = x + 'px';
+      point.style.top = y + 'px';
+      point.style.pointerEvents = 'none';
+      point.style.zIndex = '1';
+      
+      document.body.appendChild(point);
+      mouseTrail.push(point);
+      
+      // Connect to previous point
+      if (mouseTrail.length > 1) {
+        const prevPoint = mouseTrail[mouseTrail.length - 2];
+        const line = document.createElement('div');
+        line.style.position = 'fixed';
+        line.style.background = 'rgba(0, 255, 255, 0.2)';
+        line.style.height = '1px';
+        line.style.pointerEvents = 'none';
+        line.style.zIndex = '0';
+        line.style.transformOrigin = 'left center';
+        
+        const dx = x - parseInt(prevPoint.style.left);
+        const dy = y - parseInt(prevPoint.style.top);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx);
+        
+        line.style.width = distance + 'px';
+        line.style.left = prevPoint.style.left;
+        line.style.top = prevPoint.style.top;
+        line.style.transform = `rotate(${angle}rad)`;
+        
+        document.body.appendChild(line);
+        
+        // Fade out
+        setTimeout(() => {
+          line.style.transition = 'opacity 2s';
+          line.style.opacity = '0';
+          setTimeout(() => line.remove(), 2000);
+        }, 100);
+      }
+      
+      // Fade out point
+      setTimeout(() => {
+        point.style.transition = 'opacity 2s';
+        point.style.opacity = '0';
+        setTimeout(() => {
+          point.remove();
+          mouseTrail = mouseTrail.filter(p => p !== point);
+        }, 2000);
+      }, 100);
+      
+      // Limit trail length
+      if (mouseTrail.length > 5) {
+        const oldPoint = mouseTrail.shift();
+        if (oldPoint && oldPoint.parentElement) {
+          oldPoint.remove();
+        }
+      }
+    }
+
+    // Easter egg: Konami code
+    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+    let konamiIndex = 0;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === konamiCode[konamiIndex]) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+          activateHyperspace();
+          konamiIndex = 0;
+        }
+      } else {
+        konamiIndex = 0;
+      }
+    });
+
+    function activateHyperspace() {
+      document.body.style.animation = 'hyperspace 2s ease-in-out';
+      
+      // Create warp effect
+      for (let i = 0; i < 100; i++) {
+        setTimeout(() => {
+          const line = document.createElement('div');
+          line.style.position = 'fixed';
+          line.style.width = '1px';
+          line.style.height = Math.random() * 200 + 100 + 'px';
+          line.style.background = 'linear-gradient(to bottom, transparent, #fff, transparent)';
+          line.style.left = Math.random() * window.innerWidth + 'px';
+          line.style.top = '50%';
+          line.style.transform = 'translateY(-50%)';
+          line.style.zIndex = '9999';
+          line.style.pointerEvents = 'none';
+          
+          document.body.appendChild(line);
+          
+          line.animate([
+            { transform: 'translateY(-50%) scaleY(0)', opacity: 0 },
+            { transform: 'translateY(-50%) scaleY(1)', opacity: 1 },
+            { transform: 'translateY(-50%) scaleY(0)', opacity: 0 }
+          ], {
+            duration: 1000,
+            easing: 'ease-in-out'
+          }).onfinish = () => line.remove();
+        }, i * 10);
+      }
+      
+      setTimeout(() => {
+        document.body.style.animation = '';
+        alert('🚀 HYPERSPACE ACTIVATED! You found the secret code! 🌟');
+      }, 2000);
+    }
+
+    // Add hyperspace animation to styles
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes hyperspace {
+        0% { filter: blur(0px) brightness(1); }
+        50% { filter: blur(5px) brightness(2); }
+        100% { filter: blur(0px) brightness(1); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 </body>
 </html>
