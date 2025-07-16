@@ -441,11 +441,6 @@ body::after {
   border-color: var(--neon-cyan);
 }
 
-/* Rank indicators */
-.team-item:nth-child(1)::after { content: '👑'; }
-.team-item:nth-child(2)::after { content: '🥈'; }
-.team-item:nth-child(3)::after { content: '🥉'; }
-
 .team-item::after {
   position: absolute;
   right: 10px;

@@ -6,70 +6,75 @@
   <link rel="stylesheet" href="/style.css">
   <style>
     /* Additional dashboard-specific styles */
-        .rank-display {
-      position: relative;
-      padding: 20px;
-      margin-bottom: 30px;
-      position: relative;
-      overflow: hidden;
-    }
+        /* Fixed badge sizes - both team and rank badges */
 
-    .rank-badge {
-      font-size: 1rem; /* Reduced from 1.1em to match team badge */
-      padding: 0.375rem 0.75rem; /* Bootstrap badge default padding */
-      border-radius: 50px;
-      position: relative;
-      overflow: hidden;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      animation: teamGlow 2s ease-in-out infinite;
-      color: #fff;
-      display: inline-block;
-      border: none; /* Let background define the style */
-    }
+/* Make both badges smaller and more readable */
+/* Fixed badge sizes - both team and rank badges */
 
-    /* Animated background border like team badges */
-    .rank-badge::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, currentColor, transparent, currentColor);
-      border-radius: 50px;
-      opacity: 0.5;
-      z-index: -1;
-      animation: rotate 3s linear infinite;
-    }
+/* Make both badges smaller and more readable */
+.team-badge,
+.rank-badge {
+  font-size: 0.875rem; /* Smaller, more readable size */
+  padding: 0.25rem 0.75rem; /* Compact padding */
+  border-radius: 50px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px; /* Reduced letter spacing for readability */
+  text-transform: uppercase;
+  animation: teamGlow 2s ease-in-out infinite;
+  color: rgba(0, 0, 0, 0.8); /* Dark text with slight transparency */
+  text-shadow: 
+    0 0 8px rgba(255, 255, 255, 0.5),
+    0 0 2px rgba(255, 255, 255, 0.8); /* White glow for contrast */
+  display: inline-block;
+  border: none;
+  line-height: 1.5; /* Better text alignment */
+}
 
-    .rank-rookie {
-      background: rgba(100, 100, 100, 0.5);
-      color: #ccc;
-    }
+/* Keep the animated background border for both */
+.team-badge::before,
+.rank-badge::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, currentColor, transparent, currentColor);
+  border-radius: 50px;
+  opacity: 0.5;
+  z-index: -1;
+  animation: rotate 3s linear infinite;
+}
 
-    .rank-novice {
-      background: linear-gradient(135deg, var(--neon-cyan), #00ffff);
-      box-shadow: 0 0 12px var(--neon-cyan);
-    }
+/* Rank-specific colors remain the same */
+.rank-rookie {
+  background: rgba(100, 100, 100, 0.5);
+  color: #ccc;
+}
 
-    .rank-intermediate {
-      background: linear-gradient(135deg, var(--neon-green), #39ff14);
-      box-shadow: 0 0 12px var(--neon-green);
-    }
+.rank-novice {
+  background: linear-gradient(135deg, var(--neon-cyan), #00ffff);
+  box-shadow: 0 0 12px var(--neon-cyan);
+}
 
-    .rank-advanced {
-      background: linear-gradient(135deg, var(--space-accent), #5599ff);
-      box-shadow: 0 0 12px var(--space-accent);
-    }
+.rank-intermediate {
+  background: linear-gradient(135deg, var(--neon-green), #39ff14);
+  box-shadow: 0 0 12px var(--neon-green);
+}
 
-    .rank-elite {
-      background: linear-gradient(135deg, #ffd700, #ffcc00);
-      box-shadow: 0 0 14px #ffd700;
-      font-weight: 700;
-    }
+.rank-advanced {
+  background: linear-gradient(135deg, var(--space-accent), #5599ff);
+  box-shadow: 0 0 12px var(--space-accent);
+}
+
+.rank-elite {
+  background: linear-gradient(135deg, #ffd700, #ffcc00);
+  box-shadow: 0 0 14px #ffd700;
+  font-weight: 700;
+}
 
 
 
@@ -304,7 +309,7 @@
     <div class="col-md-8">
       <div class="welcome-message">
         <h1>🚀 Welcome back, <%= pseudonym %>!</h1>
-        <p class="lead">
+        <p class="lead mt-4">
   <span class="badge team-badge mt-2 bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %>">
     <%= team %> Squadron
   </span class="mt-2">
@@ -323,15 +328,19 @@
 </p>
       </div>
     </div>
-    <div class="col-md-4 text-end">
-      <div class="progress-circle-svg" id="progressCircle">
-  <svg>
-    <circle class="progress-bg" cx="60" cy="60" r="50"></circle>
-    <circle class="progress-fill" cx="60" cy="60" r="50"></circle>
-  </svg>
-  <div class="progress-text"><%= unlocked && achievements && achievements.length > 0 ? Math.round((unlocked.length / achievements.length) * 100) : 0 %>%</div>
-</div>
+   <div class="col-md-4 d-flex justify-content-end">
+  <div class="progress-circle-svg" id="progressCircle">
+    <svg>
+      <circle class="progress-bg" cx="60" cy="60" r="50"></circle>
+      <circle class="progress-fill" cx="60" cy="60" r="50"></circle>
+    </svg>
+    <div class="progress-text">
+      <%= unlocked && achievements && achievements.length > 0 ? Math.round((unlocked.length / achievements.length) * 100) : 0 %>%
     </div>
+  </div>
+</div>
+
+
   </div>
 
   <!-- Rank Display -->
@@ -352,7 +361,6 @@
         <% if (unlocked.length === achievements.length) { %>
           <span class="badge bg-success p-3">MISSION COMPLETE! 🎉</span>
         <% } else { %>
-          <span class="badge bg-info p-3"><%= achievements.length - unlocked.length %> REMAINING</span>
         <% } %>
       </div>
     </div>
@@ -413,9 +421,9 @@
         </div>
         <div class="card-body">
           <h5 class="card-title"><%= a.title %></h5>
-          <p class="card-text"><%= a.description %></p>
+          <p class="card-text text-white"><%= a.description %></p>
           <div class="d-flex justify-content-between align-items-center">
-            <span class="badge bg-<%= unlocked.includes(a.id) ? 'success' : 'secondary' %> fs-6">
+            <span class="badge mt-4 bg-<%= unlocked.includes(a.id) ? 'success' : 'secondary' %> fs-6">
               <%= a.points %> pts
             </span>
             <% if (unlocked.includes(a.id)) { %>
