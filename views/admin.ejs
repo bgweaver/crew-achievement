@@ -51,7 +51,7 @@
             <h5>Add New Crewmate</h5>
           </div>
           <div class="card-body">
-            <form id="addStudentForm">
+            <form id="addStudentForm" onsubmit="handleAddStudent(event)">
               <div class="row g-3">
                 <div class="col-md-4">
                   <label class="form-label">Pseudonym</label>
@@ -271,25 +271,24 @@
         </div>
       </div>
 
-     <!-- Replace the Achievement Stats section in your admin.ejs file (around line 280-290) with this: -->
-<div class="col-md-4">
-  <div class="card">
-    <div class="card-header">
-      <h5>Achievement Stats</h5>
-    </div>
-    <div class="card-body text-white">
-      <% achievements.forEach(achievement => { %>
-        <div class="mb-2">
-          <strong><%= achievement.title %></strong><br>
-          <small class="text-muted"><%= achievement.unlockedCount %> / <%= students.length %> students</small>
-          <div class="progress mb-2">
-            <div class="progress-bar" data-progress="<%= students.length > 0 ? Math.round((achievement.unlockedCount / students.length) * 100) : 0 %>"></div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5>Achievement Stats</h5>
+          </div>
+          <div class="card-body text-white">
+            <% achievements.forEach(achievement => { %>
+              <div class="mb-2">
+                <strong><%= achievement.title %></strong><br>
+                <small class="text-muted"><%= achievement.unlockedCount %> / <%= students.length %> students</small>
+                <div class="progress mb-2">
+                  <div class="progress-bar" data-progress="<%= students.length > 0 ? Math.round((achievement.unlockedCount / students.length) * 100) : 0 %>"></div>
+                </div>
+              </div>
+            <% }) %>
           </div>
         </div>
-      <% }) %>
-    </div>
-  </div>
-</div>
+      </div>
     </div>
   <% } %>
 
@@ -339,28 +338,37 @@
         
         <div class="card mt-4">
           <div class="card-header">
-            <h5>Bulk Student Creation</h5>
+            <h5>Bulk Student Import</h5>
           </div>
           <div class="card-body">
-            <form id="bulkCreateForm">
+            <form id="bulkImportForm">
               <div class="row g-3">
-                <div class="col-md-4">
-                  <label class="form-label">Number of Students</label>
-                  <input type="number" id="bulkCount" class="form-control" value="5" min="1" max="50">
+                <div class="col-12">
+                  <label class="form-label">Paste Pseudonyms (one per line)</label>
+                  <textarea id="bulkPseudonyms" class="form-control" rows="6" placeholder="Nebula&#10;Quasar&#10;Pulsar&#10;..." required></textarea>
                 </div>
-                <div class="col-md-4 mt-4">
-                  <label class="form-label">Theme</label>
-                  <select id="bulkTheme" class="form-select">
-                    <option value="space">Space</option>
-                    <option value="ocean">Ocean</option>
-                    <option value="forest">Forest</option>
+                <div class="col-md-6">
+                  <label class="form-label">Assign to Team</label>
+                  <select id="bulkTeam" class="form-select" required>
+                    <option value="">-- Select Team --</option>
+                    <option value="Red">Red Team</option>
+                    <option value="Blue">Blue Team</option>
+                    <option value="Green">Green Team</option>
+                    <option value="Yellow">Yellow Team</option>
                   </select>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
-                  <button type="submit" class="btn btn-info w-100 mb-1">Create Students</button>
+                <div class="col-md-6 d-flex align-items-end">
+                  <button type="submit" class="btn btn-info w-100">Import Students</button>
                 </div>
               </div>
             </form>
+            <div id="bulkImportResults" class="mt-3" style="display: none;">
+              <div class="alert alert-info">
+                <h6>Import Results</h6>
+                <div id="importSummary"></div>
+                <small class="text-muted">PINs have been saved to the plaintext file for admin export.</small>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -371,68 +379,22 @@
             <h5>⚠️ Danger Zone</h5>
           </div>
           <div class="card-body">
-  <button class="btn btn-outline-danger w-100 mb-2" onclick="confirmResetAllProgress()">
-    Reset All Progress
-  </button>
-  <small class="text-muted">This will remove all achievements from all students but keep the students.</small>
-  
-  <hr>
+            <button class="btn btn-outline-danger w-100 mb-2" onclick="confirmResetAllProgress()">
+              Reset All Progress
+            </button>
+            <small class="text-muted">This will remove all achievements from all students but keep the students.</small>
+            
+            <hr>
 
-  <button class="btn btn-outline-primary w-100 mb-2" onclick="exportPINs()">
-    Export Plaintext PINs
-  </button>
-  <small class="text-muted d-block mb-3">Downloads a JSON file of all current plaintext PINs for one-time admin export.</small>
-  
-  <button class="btn btn-outline-warning w-100" onclick="clearPINs()">
-    Clear Plaintext PINs
-  </button>
-  <small class="text-muted d-block mt-1">Deletes the plaintext PINs file. This action is irreversible.</small>
-</div>
-
-
-        </div>
-      </div>
-    </div>
-  <% } %>
-
-  <!-- Enhanced Dashboard -->
-  <% if (view === 'dashboard') { %>
-    <h2>📊 Dashboard</h2>
-    
-    <div class="row">
-      <div class="col-md-3 mb-3">
-        <div class="card text-center">
-          <div class="card-body">
-            <h5 class="card-title">Total Students</h5>
-            <h2 class="text-primary"><%= students.length %></h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 mb-3">
-        <div class="card text-center">
-          <div class="card-body">
-            <h5 class="card-title">Total Points Earned</h5>
-            <h2 class="text-success"><%= students.reduce((sum, s) => sum + s.totalPoints, 0) %></h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 mb-3">
-        <div class="card text-center">
-          <div class="card-body">
-            <h5 class="card-title">Achievements</h5>
-            <h2 class="text-warning"><%= achievements.length %></h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 mb-3">
-        <div class="card text-center">
-          <div class="card-body">
-            <h5 class="card-title">Avg Progress</h5>
-            <% 
-              const avgProgress = students.length > 0 && achievements.length > 0 ? 
-                Math.round(students.reduce((sum, s) => sum + s.achievementCount, 0) / students.length / achievements.length * 100) : 0;
-            %>
-            <h2 class="text-info"><%= avgProgress %>%</h2>
+            <button class="btn btn-outline-primary w-100 mb-2" onclick="exportPINs()">
+              Export Plaintext PINs
+            </button>
+            <small class="text-muted d-block mb-3">Downloads a JSON file of all current plaintext PINs for one-time admin export.</small>
+            
+            <button class="btn btn-outline-warning w-100" onclick="clearPINs()">
+              Clear Plaintext PINs
+            </button>
+            <small class="text-muted d-block mt-1">Deletes the plaintext PINs file. This action is irreversible.</small>
           </div>
         </div>
       </div>
@@ -465,27 +427,32 @@
     }
 
     // Add student
-    document.getElementById('addStudentForm')?.addEventListener('submit', async (e) => {
+    function handleAddStudent(e) {
       e.preventDefault();
       const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData);
+      const data = {
+        customPseudonym: formData.get('pseudonym'),
+        pin: formData.get('pin'),
+        team: formData.get('team')
+      };
       
-      // Use custom pseudonym if provided, otherwise leave empty for auto-generation
-      data.customPseudonym = data.pseudonym;
-      
-      const response = await fetch('/admin/add-student', {
+      fetch('/admin/add-student', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          location.reload();
+        } else {
+          alert('Error: ' + result.error);
+        }
+      })
+      .catch(err => {
+        alert('Error adding student: ' + err.message);
       });
-      
-      const result = await response.json();
-      if (result.success) {
-        location.reload();
-      } else {
-        alert('Error: ' + result.error);
-      }
-    });
+    }
 
     // Delete student
     async function deleteStudent(pseudonym) {
@@ -556,26 +523,53 @@
       });
     }
 
-    // Bulk create students
-    document.getElementById('bulkCreateForm')?.addEventListener('submit', async (e) => {
+    // Bulk import students
+    document.getElementById('bulkImportForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const count = parseInt(document.getElementById('bulkCount').value);
-      const theme = document.getElementById('bulkTheme').value;
+      const pseudonyms = document.getElementById('bulkPseudonyms').value;
+      const team = document.getElementById('bulkTeam').value;
       
-      if (confirm(`Create ${count} students with ${theme} theme?`)) {
-        for (let i = 0; i < count; i++) {
-          const response = await fetch('/admin/add-student', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ theme })
-          });
+      if (!team) {
+        alert('Please select a team');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/admin/bulk-import-students', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pseudonyms, team })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          const resultsDiv = document.getElementById('bulkImportResults');
+          const summaryDiv = document.getElementById('importSummary');
           
-          if (!response.ok) {
-            alert('Error creating student ' + (i + 1));
-            break;
+          let html = `<p><strong>${result.added} students added to ${team} Team!</strong></p>`;
+          
+          if (result.errors && result.errors.length > 0) {
+            html += '<p class="text-danger">Errors:</p><ul>';
+            result.errors.forEach(err => {
+              html += `<li>${err}</li>`;
+            });
+            html += '</ul>';
           }
+          
+          summaryDiv.innerHTML = html;
+          resultsDiv.style.display = 'block';
+          
+          // Clear form
+          document.getElementById('bulkPseudonyms').value = '';
+          document.getElementById('bulkTeam').value = '';
+          
+          // Reload after 3 seconds
+          setTimeout(() => location.reload(), 3000);
+        } else {
+          alert('Error: ' + result.error);
         }
-        location.reload();
+      } catch (err) {
+        alert('Error importing students: ' + err.message);
       }
     });
 
@@ -588,42 +582,45 @@
         }
       }
     }
+
     async function exportPINs() {
-  if (!confirm('Export all plaintext PINs? This will download a JSON file containing sensitive data.')) return;
+      if (!confirm('Export all plaintext PINs? This will download a JSON file containing sensitive data.')) return;
 
-  try {
-    const response = await fetch('/admin/export-pins');
-    if (!response.ok) throw new Error('Failed to export PINs.');
+      try {
+        const response = await fetch('/admin/export-pins');
+        if (!response.ok) throw new Error('Failed to export PINs.');
 
-    const data = await response.json();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'plaintext-pins.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    alert('Error exporting PINs: ' + err.message);
-  }
-}
+        const data = await response.json();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'plaintext-pins-' + new Date().toISOString().split('T')[0] + '.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('Error exporting PINs: ' + err.message);
+      }
+    }
 
-async function clearPINs() {
-  if (!confirm('Are you sure you want to CLEAR all plaintext PINs? This cannot be undone.')) return;
+    async function clearPINs() {
+      if (!confirm('Are you sure you want to CLEAR all plaintext PINs? This cannot be undone.')) return;
 
-  try {
-    const response = await fetch('/admin/clear-pins', { method: 'POST' });
-    if (!response.ok) throw new Error('Failed to clear PINs.');
-
-    alert('Plaintext PINs cleared successfully.');
-  } catch (err) {
-    alert('Error clearing PINs: ' + err.message);
-  }
-}
-
+      try {
+        const response = await fetch('/admin/clear-pins', { method: 'POST' });
+        const result = await response.json();
+        
+        if (result.success) {
+          alert('Plaintext PINs cleared successfully.');
+        } else {
+          throw new Error(result.error || 'Failed to clear PINs');
+        }
+      } catch (err) {
+        alert('Error clearing PINs: ' + err.message);
+      }
+    }
   </script>
-  
 </body>
 </html>
