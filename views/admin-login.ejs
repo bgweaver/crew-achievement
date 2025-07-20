@@ -12,7 +12,7 @@
       <div class="card">
         <div class="card-header">
           <h1 class="text-center mt-3">S.S. Valiant Inquiry</h1>
-          <p class="text-center text-muted">Welcome Back, Captain</p>
+          <p class="text-center text-white">Welcome Back, Captain</p>
         </div>
         <div class="card-body">
           <% if (error) { %>
@@ -21,11 +21,11 @@
           
           <form action="/admin-login" method="POST">
             <div class="mb-3 mt-3">
-              <label for="username" class="form-label">Username</label>
+              <label for="username" class="form-label text-white">Username</label>
               <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="mb-3 mt-4">
-              <label for="password" class="form-label">Password</label>
+              <label for="password" class="form-label text-white">Password</label>
               <input type="password" class="form-control" id="password" name="password" required>
             </div>
             <button type="submit" class="btn btn-primary my-4 w-100">Login</button>

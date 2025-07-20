@@ -48,27 +48,27 @@
         <!-- Add Student Form -->
         <div class="card mb-4">
           <div class="card-header">
-            <h5>Add New Crewmate</h5>
+            <h5 class="text-white">Add New Crewmate</h5>
           </div>
           <div class="card-body">
             <form id="addStudentForm" onsubmit="handleAddStudent(event)">
               <div class="row g-3">
                 <div class="col-md-4">
-                  <label class="form-label">Pseudonym</label>
+                  <label class="form-label text-white">Pseudonym</label>
                   <div class="input-group">
                     <input type="text" id="newPseudonym" name="pseudonym" class="form-control" placeholder="Auto-generated">
                     <button type="button" class="btn btn-outline-secondary" onclick="generatePseudonym()">🎲</button>
                   </div>
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label">PIN</label>
+                  <label class="form-label text-white">PIN</label>
                   <div class="input-group">
                     <input type="text" id="newPIN" name="pin" class="form-control" placeholder="Auto-generated">
                     <button type="button" class="btn btn-outline-secondary" onclick="generatePIN()">🎲</button>
                   </div>
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label">Team</label>
+                  <label class="form-label text-white">Team</label>
                   <select name="team" class="form-select">
                     <option value="">Auto-balance</option>
                     <option value="Red">Red</option>
@@ -118,7 +118,7 @@
                           <% if (unlocked.includes(a.id)) { %>checked<% } %>>
                         <label class="form-check-label" for="ach-<%= a.id %>">
                           <strong><%= a.title %></strong> (<%= a.points %> pts)<br>
-                          <small class="text-muted"><%= a.description %></small>
+                          <small><%= a.description %></small>
                         </label>
                       </div>
                     </div>
@@ -226,7 +226,7 @@
           </div>
           <div class="card-body">
             <form id="addAchievementForm">
-              <div class="row g-3">
+              <div class="row g-3 text-white">
                 <div class="col-md-6">
                   <label class="form-label">Title</label>
                   <input type="text" name="title" class="form-control" required>
@@ -252,14 +252,14 @@
           </div>
         </div>
 
-        <div class="row">
+        <div class="row text-white">
           <% achievements.forEach(achievement => { %>
             <div class="col-md-6 mb-3">
               <div class="card">
                 <img src="<%= achievement.image %>" class="card-img-top" alt="<%= achievement.title %>" style="height: 150px; object-fit: cover;">
                 <div class="card-body">
                   <h6 class="card-title"><%= achievement.title %></h6>
-                  <p class="card-text"><%= achievement.description %></p>
+                  <p class="card-text text-white"><%= achievement.description %></p>
                   <div class="d-flex justify-content-between align-items-center">
                     <span class="badge bg-success"><%= achievement.points %> pts</span>
                     <button class="btn btn-sm btn-danger" onclick="deleteAchievement('<%= achievement.id %>')">Delete</button>
@@ -280,7 +280,7 @@
             <% achievements.forEach(achievement => { %>
               <div class="mb-2">
                 <strong><%= achievement.title %></strong><br>
-                <small class="text-muted"><%= achievement.unlockedCount %> / <%= students.length %> students</small>
+                <small class=""><%= achievement.unlockedCount %> / <%= students.length %> students</small>
                 <div class="progress mb-2">
                   <div class="progress-bar" data-progress="<%= students.length > 0 ? Math.round((achievement.unlockedCount / students.length) * 100) : 0 %>"></div>
                 </div>
@@ -302,7 +302,7 @@
           <div class="card-header">
             <h5>Bulk Assign Achievement</h5>
           </div>
-          <div class="card-body">
+          <div class="card-body text-white">
             <form method="POST" action="/admin" class="row g-3">
               <input type="hidden" name="bulkAssign" value="1">
               
@@ -340,7 +340,7 @@
           <div class="card-header">
             <h5>Bulk Student Import</h5>
           </div>
-          <div class="card-body">
+          <div class="card-body text-white">
             <form id="bulkImportForm">
               <div class="row g-3">
                 <div class="col-12">
@@ -382,19 +382,19 @@
             <button class="btn btn-outline-danger w-100 mb-2" onclick="confirmResetAllProgress()">
               Reset All Progress
             </button>
-            <small class="text-muted">This will remove all achievements from all students but keep the students.</small>
+            <small class="text-white">This will remove all achievements from all students but keep the students.</small>
             
             <hr>
 
             <button class="btn btn-outline-primary w-100 mb-2" onclick="exportPINs()">
               Export Plaintext PINs
             </button>
-            <small class="text-muted d-block mb-3">Downloads a JSON file of all current plaintext PINs for one-time admin export.</small>
+            <small class="text-white d-block mb-3">Downloads a JSON file of all current plaintext PINs for one-time admin export.</small>
             
             <button class="btn btn-outline-warning w-100" onclick="clearPINs()">
               Clear Plaintext PINs
             </button>
-            <small class="text-muted d-block mt-1">Deletes the plaintext PINs file. This action is irreversible.</small>
+            <small class="text-white d-block mt-1">Deletes the plaintext PINs file. This action is irreversible.</small>
           </div>
         </div>
       </div>

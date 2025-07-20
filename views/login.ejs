@@ -508,22 +508,25 @@
 ];
 
 
-    let factIndex = 0;
-    function rotateFacts() {
-      const factElement = document.getElementById('spaceFacts');
-      
-      // Fade out
-      factElement.style.opacity = '0';
-      
-      setTimeout(() => {
-        // Change text while invisible
-        factElement.textContent = spaceFacts[factIndex];
-        factIndex = (factIndex + 1) % spaceFacts.length;
-        
-        // Fade back in
-        factElement.style.opacity = '0.7';
-      }, 800); // Wait for fade out to complete
-    }
+    let lastFactIndex = -1;
+
+function rotateFacts() {
+  const factElement = document.getElementById('spaceFacts');
+  factElement.style.transition = 'opacity 0.5s';
+  factElement.style.opacity = '0';
+
+  setTimeout(() => {
+    let newIndex;
+    do {
+      newIndex = Math.floor(Math.random() * spaceFacts.length);
+    } while (newIndex === lastFactIndex && spaceFacts.length > 1); // avoid repeat
+
+    lastFactIndex = newIndex;
+
+    factElement.textContent = spaceFacts[newIndex];
+    factElement.style.opacity = '1';
+  }, 500);
+}
 
     // Start rotating facts
     rotateFacts();
