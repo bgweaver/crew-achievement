@@ -646,3 +646,17 @@ h1 {
 
 
 }
+
+.space-station-title {
+  font-family: 'Audiowide', sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  text-shadow:
+    0 0 8px rgba(75, 110, 245, 0.5),
+    0 0 15px rgba(0, 255, 255, 0.3),
+    0 0 25px rgba(255, 0, 110, 0.15);
+  animation: titleGlow 3s ease-in-out infinite;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}

@@ -300,7 +300,7 @@
         <h1>🚀 Welcome back, <%= pseudonym %>!</h1>
         <p class="lead mt-4">
           <span class="badge team-badge mt-2 bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %>">
-            <%= team %> Squadron
+            <%= team %> Crew
           </span>
           <% 
             const progress = unlocked.length / achievements.length;
@@ -312,7 +312,7 @@
             else if (progress >= 0.25) { rank = 'Novice'; rankClass = 'rank-novice'; }
           %>
           <span class="badge rank-badge mt-2 <%= rankClass %>">
-            <%= rank %> Pilot
+            <%= rank %> Cadet
           </span>
         </p>
       </div>
@@ -363,7 +363,7 @@
     <div class="stat-card">
       <div class="stat-label">Team</div>
       <div class="stat-value"><%= team %></div>
-      <div class="stat-label">🚀 Squadron</div>
+      <div class="stat-label">🚀 Crew</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Progress</div>
@@ -420,7 +420,7 @@
   </div>
 
   <div class="text-center mt-5 mb-4">
-    <a href="/" class="btn btn-outline-primary">← Return to Base</a>
+    <a href="/" class="btn btn-outline-primary">← Logout</a>
   </div>
   
   <div id="achievement-pop"></div>
@@ -435,7 +435,7 @@
     // Space facts for the dashboard
     const spaceFacts = [
       "Keep pushing, <%= pseudonym %>! You're <%= Math.round((unlocked.length / achievements.length) * 100) %>% of the way to completion!",
-      "Your <%= team %> Squadron is counting on you!",
+      "Your <%= team %> Crew is counting on you!",
       "Venus spins backwards and super slowly — one day on Venus is longer than its year.",
   "A teaspoon of neutron star would weigh about a billion tons — no, seriously.",
   "The Sun accounts for 99.8% of the mass in the solar system.",

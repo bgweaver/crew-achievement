@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Valiant Inquiry - Space Station Login</title>
+  <title>Valiant Inquiry - Crew Login</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
   <style>
     /* Enhanced Space Theme CSS - Ultra Cool Edition */
@@ -119,18 +122,6 @@
     }
 
     /* Additional login-specific styles */
-    .space-station-title {
-      font-size: 3rem;
-      font-weight: 900;
-      color: var(--text-primary);
-      text-shadow: 
-        0 0 20px rgba(75, 110, 245, 0.8),
-        0 0 40px rgba(0, 255, 255, 0.5),
-        0 0 60px rgba(255, 0, 110, 0.3);
-      animation: titleGlow 3s ease-in-out infinite;
-      margin-bottom: 20px;
-      letter-spacing: 2px;
-    }
 
     @keyframes titleGlow {
       0%, 100% { 
@@ -148,6 +139,9 @@
     }
 
     .subtitle {
+      font-family: "Rajdhani", sans-serif;
+  font-weight: 400;
+  font-style: normal;
       font-size: 1.2rem;
       color: var(--neon-cyan);
       text-shadow: 0 0 10px var(--neon-cyan);
@@ -344,6 +338,22 @@
       z-index: 100;
       transition: opacity 1s ease-in-out;
     }
+
+
+.space-station-title {
+  font-family: 'Audiowide', sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  text-shadow:
+    0 0 8px rgba(75, 110, 245, 0.5),
+    0 0 15px rgba(0, 255, 255, 0.3),
+    0 0 25px rgba(255, 0, 110, 0.15);
+  animation: titleGlow 3s ease-in-out infinite;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
   </style>
 </head>
 <body>
@@ -358,8 +368,8 @@
       <div class="col-md-8 col-lg-6">
         <div class="login-container p-5 hologram-effect">
           <div class="text-center mb-2">
-            <h1 class="space-station-title">S.S. VALIANT INQUIRY</h1>
-            <p class="subtitle mb-3">GALACTIC LEARNING STATION</p>
+            <h1 class="space-station-title">M.O.S. VALIANT INQUIRY</h1>
+            <p class="subtitle mb-3">Observe. Question. Explore.</p>
             <div class="mb-2">
               <small style="color: white;">Stardate: <%= new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></small>
             </div>
@@ -374,25 +384,25 @@
           <form action="/login" method="POST" class="login-form">
             <div class="auth-required">AUTHENTICATION REQUIRED</div>
             <div class="mb-4">
-              <label for="pseudonym" class="form-label fs-5">🚀 Pilot Callsign</label>
+              <label for="pseudonym" class="form-label fs-5">👤 Username</label>
               <input type="text" class="form-control form-control-lg" id="pseudonym" name="pseudonym" required 
-                     placeholder="Enter your space name" autocomplete="off">
+                     placeholder="Enter your crew identifier" autocomplete="off">
             </div>
             <div class="mb-4">
-              <label for="pin" class="form-label fs-5">🔐 Access Code</label>
+              <label for="pin" class="form-label fs-5">🔒 Access Code</label>
               <input type="password" class="form-control form-control-lg" id="pin" name="pin" required 
                      placeholder="4-digit security PIN" maxlength="4" pattern="[0-9]{4}">
             </div>
             <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
-              🚀 ENGAGE HYPERDRIVE
+              Login
             </button>
           </form>
 
           <div class="text-center">
             <small style="color: white;">
-              Lost in space? Contact Mission Control.<br>
+              Forgot your access information? Ask your commanding officer.<br>
               <a href="/admin-login" class="text-decoration-none" style="color: var(--space-accent);">
-                🛸 Commander Access Portal
+                Officers' Access Portal
               </a>
             </small>
           </div>
@@ -401,7 +411,7 @@
         <% if (Object.keys(teamScores).length > 0) { %>
           <div class="team-standings p-4 mt-5 mb-3">
             <h3 class="text-center mb-4" style="color: var(--neon-cyan); text-shadow: 0 0 20px var(--neon-cyan);">
-              🌟 SQUADRON RANKINGS 🌟
+              CREW RANKINGS
             </h3>
             
             <!-- Team Preview Cards -->
@@ -430,7 +440,7 @@
                     <span class="badge bg-<%= index === 0 ? 'warning' : index === 1 ? 'secondary' : index === 2 ? 'info' : 'dark' %> me-2">
                       <%= index + 1 %>
                     </span>
-                    <span class="fs-5"><%= team %> Squadron</span>
+                    <span class="fs-5"><%= team %> Crew</span>
                   </div>
                   <span class="badge bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %> fs-6">
                     <%= score %> pts
