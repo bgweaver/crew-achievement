@@ -54,6 +54,13 @@ function loadJSON(filePath) {
       } else if (filePath.includes('achievements.json')) {
         const defaultAchievements = [
           {
+            id: "welcome_aboard",
+            title: "Welcome Aboard!",
+            description: "Join the crew and begin your journey among the stars",
+            points: 5,
+            image: "https://via.placeholder.com/300x200/4CAF50/white?text=Welcome+Aboard!"
+          },
+          {
             id: "first_mission",
             title: "First Mission",
             description: "Complete your first assignment",
@@ -144,6 +151,93 @@ function savePlainPIN(pseudonym, pin) {
   fs.writeFileSync(plainPinsPath, JSON.stringify(plainPins, null, 2));
 }
 
+// Function to calculate balanced team scores
+function calculateBalancedTeamScores(students, achievements) {
+  const teams = {};
+  const teamMemberCounts = {};
+  
+  // Initialize team counts
+  ['Red', 'Blue', 'Green', 'Yellow'].forEach(team => {
+    teams[team] = 0;
+    teamMemberCounts[team] = 0;
+  });
+  
+  // Calculate total points per team and member counts
+  students.forEach(s => {
+    if (teams[s.team] !== undefined) {
+      const studentPoints = (s.unlocked || []).reduce((sum, id) => {
+        const ach = achievements.find(a => a.id === id);
+        return sum + (ach?.points || 0);
+      }, 0);
+      teams[s.team] += studentPoints;
+      teamMemberCounts[s.team]++;
+    }
+  });
+  
+  // Balance scores by dividing by team size and multiplying by 25
+  Object.keys(teams).forEach(team => {
+    if (teamMemberCounts[team] > 0) {
+      teams[team] = Math.round((teams[team] / teamMemberCounts[team]) * 25);
+    } else {
+      teams[team] = 0;
+    }
+  });
+  
+  return teams;
+}
+
+// Function to calculate student rank among all students
+function calculateStudentRank(studentPseudonym, students, achievements) {
+  // Calculate points for all students
+  const studentsWithPoints = students.map(s => {
+    const points = (s.unlocked || []).reduce((sum, id) => {
+      const ach = achievements.find(a => a.id === id);
+      return sum + (ach?.points || 0);
+    }, 0);
+    return { pseudonym: s.pseudonym, points };
+  });
+  
+  // Sort by points (descending)
+  studentsWithPoints.sort((a, b) => b.points - a.points);
+  
+  // Find the student's rank
+  const studentIndex = studentsWithPoints.findIndex(s => s.pseudonym === studentPseudonym);
+  return studentIndex !== -1 ? studentIndex + 1 : students.length;
+}
+
+// Function to migrate existing students to have achievement dates
+function migrateStudentAchievementDates() {
+  const students = loadJSON(studentsPath);
+  let needsSave = false;
+
+  students.forEach(student => {
+    if (!student.achievementDates) {
+      student.achievementDates = {};
+      needsSave = true;
+    }
+
+    // If they have unlocked achievements but no dates, use their dateAdded as fallback
+    if (student.unlocked && student.unlocked.length > 0) {
+      const fallbackDate = student.dateAdded || new Date().toISOString();
+      
+      student.unlocked.forEach(achievementId => {
+        if (!student.achievementDates[achievementId]) {
+          student.achievementDates[achievementId] = fallbackDate;
+          needsSave = true;
+        }
+      });
+    }
+  });
+
+  if (needsSave) {
+    saveJSON(studentsPath, students);
+    console.log('📅 Migrated achievement dates for existing students');
+  }
+}
+
+// Run migration on startup
+migrateStudentAchievementDates();
+
 // Middleware to check admin authentication
 function requireAdmin(req, res, next) {
   if (req.session.isAdmin) {
@@ -158,15 +252,7 @@ app.get("/", (req, res) => {
   const students = loadJSON(studentsPath);
   const achievements = loadJSON(achievementsPath);
 
-  const teamScores = {};
-  students.forEach(s => {
-    const studentPoints = (s.unlocked || []).reduce((sum, id) => {
-      const ach = achievements.find(a => a.id === id);
-      return sum + (ach?.points || 0);
-    }, 0);
-    if (!teamScores[s.team]) teamScores[s.team] = 0;
-    teamScores[s.team] += studentPoints;
-  });
+  const teamScores = calculateBalancedTeamScores(students, achievements);
 
   res.render("login", { teamScores, error: null });
 });
@@ -179,15 +265,7 @@ app.post("/login", (req, res) => {
   const student = students.find(s => s.pseudonym === pseudonym);
 
   if (!student || !bcrypt.compareSync(pin, student.pin)) {
-    const teamScores = {};
-    students.forEach(s => {
-      const studentPoints = (s.unlocked || []).reduce((sum, id) => {
-        const ach = achievements.find(a => a.id === id);
-        return sum + (ach?.points || 0);
-      }, 0);
-      if (!teamScores[s.team]) teamScores[s.team] = 0;
-      teamScores[s.team] += studentPoints;
-    });
+    const teamScores = calculateBalancedTeamScores(students, achievements);
     return res.render("login", { error: "Invalid pseudonym or PIN", teamScores });
   }
 
@@ -216,6 +294,9 @@ app.post("/login", (req, res) => {
     return grantedDate && new Date(grantedDate) > lastLogin;
   });
 
+  // Calculate student's overall rank
+  const studentRank = calculateStudentRank(pseudonym, students, achievements);
+
   // Update last login time
   student.lastLogin = currentLogin.toISOString();
   saveJSON(studentsPath, students);
@@ -227,7 +308,8 @@ app.post("/login", (req, res) => {
     totalPoints,
     team: student.team,
     studentData: student,
-    newlyUnlocked
+    newlyUnlocked,
+    studentRank
   });
 });
 
@@ -350,6 +432,7 @@ app.post("/admin", requireAdmin, (req, res) => {
 
 app.post("/admin/add-student", requireAdmin, (req, res) => {
   const students = loadJSON(studentsPath);
+  const achievements = loadJSON(achievementsPath);
   const { pseudonym, pin, team, customPseudonym, theme } = req.body;
   
   const existingPseudonyms = students.map(s => s.pseudonym);
@@ -368,13 +451,16 @@ app.post("/admin/add-student", requireAdmin, (req, res) => {
   // Hash the PIN before saving it with the student object
   const hashedPIN = bcrypt.hashSync(finalPIN, 10);
 
+  const currentTime = new Date().toISOString();
   const newStudent = {
     pseudonym: finalPseudonym,
     pin: hashedPIN,
     team: finalTeam,
-    unlocked: [],
-    achievementDates: {},
-    dateAdded: new Date().toISOString()
+    unlocked: ["welcome_aboard"], // Automatically give Welcome Aboard achievement
+    achievementDates: {
+      "welcome_aboard": currentTime // Track when they joined
+    },
+    dateAdded: currentTime
   };
 
   students.push(newStudent);
@@ -401,6 +487,7 @@ app.post("/admin/bulk-import-students", requireAdmin, (req, res) => {
   const existingPseudonyms = students.map(s => s.pseudonym);
   const results = [];
   const errors = [];
+  const currentTime = new Date().toISOString();
 
   pseudonymList.forEach(pseudonym => {
     if (existingPseudonyms.includes(pseudonym) || results.some(r => r.pseudonym === pseudonym)) {
@@ -417,9 +504,11 @@ app.post("/admin/bulk-import-students", requireAdmin, (req, res) => {
       pseudonym,
       pin: hashedPIN,
       team,
-      unlocked: [],
-      achievementDates: {},
-      dateAdded: new Date().toISOString()
+      unlocked: ["welcome_aboard"], // Automatically give Welcome Aboard achievement
+      achievementDates: {
+        "welcome_aboard": currentTime // Track when they joined
+      },
+      dateAdded: currentTime
     };
 
     students.push(newStudent);
@@ -524,6 +613,16 @@ app.post("/admin/clear-pins", requireAdmin, (req, res) => {
     } else {
       res.json({ success: true, message: "No file to clear" });
     }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Manual migration route for achievement dates
+app.post("/admin/migrate-dates", requireAdmin, (req, res) => {
+  try {
+    migrateStudentAchievementDates();
+    res.json({ success: true, message: "Achievement dates migrated successfully" });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

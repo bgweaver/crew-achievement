@@ -3,291 +3,10 @@
 <head>
   <title>Valiant Inquiry - Crew Dashboard</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;600;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
-  <style>
-    /* Additional dashboard-specific styles */
-    /* Fixed badge sizes - both team and rank badges */
-    .team-badge,
-    .rank-badge {
-      font-size: 0.875rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 50px;
-      position: relative;
-      overflow: hidden;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      animation: teamGlow 2s ease-in-out infinite;
-      color: rgba(0, 0, 0, 0.8);
-      text-shadow: 
-        0 0 8px rgba(255, 255, 255, 0.5),
-        0 0 2px rgba(255, 255, 255, 0.8);
-      display: inline-block;
-      border: none;
-      line-height: 1.5;
-    }
-
-    /* Keep the animated background border for both */
-    .team-badge::before,
-    .rank-badge::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, currentColor, transparent, currentColor);
-      border-radius: 50px;
-      opacity: 0.5;
-      z-index: -1;
-      animation: rotate 3s linear infinite;
-    }
-
-    /* Rank-specific colors remain the same */
-    .rank-rookie {
-      background: rgba(100, 100, 100, 0.5);
-      color: #ccc;
-    }
-
-    .rank-novice {
-      background: linear-gradient(135deg, var(--neon-cyan), #00ffff);
-      box-shadow: 0 0 12px var(--neon-cyan);
-    }
-
-    .rank-intermediate {
-      background: linear-gradient(135deg, var(--neon-green), #39ff14);
-      box-shadow: 0 0 12px var(--neon-green);
-    }
-
-    .rank-advanced {
-      background: linear-gradient(135deg, var(--space-accent), #5599ff);
-      box-shadow: 0 0 12px var(--space-accent);
-    }
-
-    .rank-elite {
-      background: linear-gradient(135deg, #ffd700, #ffcc00);
-      box-shadow: 0 0 14px #ffd700;
-      font-weight: 700;
-    }
-
-    .achievement-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 25px;
-      margin-top: 30px;
-    }
-
-    .achievement-progress {
-      width: 100%;
-      height: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      overflow: hidden;
-      margin-top: 10px;
-      position: relative;
-    }
-
-    .achievement-progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--neon-cyan), var(--space-accent));
-      border-radius: 5px;
-      transition: width 1s ease;
-      box-shadow: 0 0 10px currentColor;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .achievement-progress-bar::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      animation: progressShine 2s linear infinite;
-    }
-
-    @keyframes progressShine {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .welcome-message {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-      opacity: 0;
-      animation: fadeInUp 1s ease forwards;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .power-meter {
-      width: 100%;
-      height: 30px;
-      background: rgba(0, 0, 0, 0.5);
-      border: 2px solid rgba(75, 110, 245, 0.5);
-      border-radius: 15px;
-      overflow: hidden;
-      position: relative;
-      margin: 20px 0;
-    }
-
-    .power-meter-fill {
-      height: 100%;
-      background: linear-gradient(90deg, 
-        var(--neon-green) 0%, 
-        var(--neon-cyan) 50%, 
-        var(--space-accent) 100%);
-      transition: width 1s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .power-meter-fill::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.3);
-      animation: powerScan 2s linear infinite;
-    }
-
-    @keyframes powerScan {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-
-    .crew-id {
-      font-family: 'Orbitron', monospace;
-      font-size: 0.9rem;
-      color: var(--neon-cyan);
-      letter-spacing: 2px;
-      margin-bottom: 20px;
-      opacity: 0.8;
-    }
-
-    /* Add padding for fixed space facts bar */
-    body {
-      padding-bottom: 80px;
-    }
-
-    .space-facts {
-      padding: 15px 20px;
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      font-style: italic;
-      z-index: 100;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
-    }
-
-    .stat-card {
-      background: rgba(20, 20, 40, 0.7);
-      border-radius: 12px;
-      padding: 15px 20px;
-      color: var(--neon-cyan);
-      box-shadow: 0 0 10px var(--neon-cyan);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      font-family: 'Orbitron', monospace;
-      transition: transform 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: scale(1.05);
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      opacity: 0.7;
-      margin-top: 8px;
-    }
-
-    .stat-value {
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    .progress-circle-svg {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      margin: 0 auto;
-    }
-
-    .progress-circle-svg svg {
-      width: 100%;
-      height: 100%;
-      transform: rotate(-90deg);
-    }
-
-    .progress-bg {
-      fill: none;
-      stroke: rgba(255, 255, 255, 0.1);
-      stroke-width: 8;
-      stroke-linecap: round;
-    }
-
-    .progress-fill {
-      fill: none;
-      stroke: var(--neon-cyan, #00ffff);
-      stroke-width: 8;
-      stroke-linecap: round;
-      stroke-dasharray: 314;
-      stroke-dashoffset: 314;
-      transition: stroke-dashoffset 1s ease;
-      filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.6));
-    }
-
-    .progress-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--neon-cyan, #00ffff);
-      text-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
-      font-family: 'Orbitron', monospace;
-    }
-
-    .progress-circle-svg.complete .progress-fill {
-      stroke: var(--neon-green, #39ff14);
-      filter: drop-shadow(0 0 6px rgba(57, 255, 20, 0.7));
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    .progress-circle-svg.complete .progress-text {
-      color: var(--neon-green, #39ff14);
-      text-shadow: 0 0 8px rgba(57, 255, 20, 0.8);
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-  </style>
 </head>
 <body class="container mt-5">
   <!-- Particle effects -->
@@ -297,7 +16,7 @@
   <div class="row mb-4">
     <div class="col-md-8">
       <div class="welcome-message">
-        <h1>🚀 Welcome back, <%= pseudonym %>!</h1>
+        <h1>Welcome back, <%= pseudonym %>!</h1>
         <p class="lead mt-4">
           <span class="badge team-badge mt-2 bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %>">
             <%= team %> Crew
@@ -361,14 +80,14 @@
       <div class="stat-label">🏆 Collected</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Team</div>
-      <div class="stat-value"><%= team %></div>
-      <div class="stat-label">🚀 Crew</div>
+      <div class="stat-label">Playing Time</div>
+      <div class="stat-value" id="playingTime">Calculating...</div>
+      <div class="stat-label">🕐 Days Active</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Progress</div>
-      <div class="stat-value"><%= Math.round((unlocked.length / achievements.length) * 100) %>%</div>
-      <div class="stat-label">📈 Complete</div>
+      <div class="stat-label">Overall Rank</div>
+      <div class="stat-value" id="overallRank">Calculating...</div>
+      <div class="stat-label">📊 Position</div>
     </div>
   </div>
 
@@ -437,84 +156,120 @@
       "Keep pushing, <%= pseudonym %>! You're <%= Math.round((unlocked.length / achievements.length) * 100) %>% of the way to completion!",
       "Your <%= team %> Crew is counting on you!",
       "Venus spins backwards and super slowly — one day on Venus is longer than its year.",
-  "A teaspoon of neutron star would weigh about a billion tons — no, seriously.",
-  "The Sun accounts for 99.8% of the mass in the solar system.",
-  "Jupiter is so big you could fit all the other planets inside it — and still have room left.",
-  "Saturn’s rings look solid but they’re made of billions of ice chunks, some as small as pebbles.",
-  "Mars has the tallest volcano in the solar system — Olympus Mons — nearly 3x the height of Mount Everest.",
-  "The Moon is slowly drifting away from Earth — about 1.5 inches per year.",
-  "Uranus rotates on its side — its tilt is so extreme, it basically rolls around the Sun.",
-  "Mercury has almost no atmosphere, so its surface temperature swings 1000°F between day and night.",
-  "Pluto has mountains made of ice, and it may have a subsurface ocean.",
-  "In space, metal pieces can weld together without heat — it's called cold welding.",
-  "A day on Jupiter is only about 10 hours long — fastest spinner in the solar system.",
-  "Earth is the only planet known to have plate tectonics (and life, of course).",
-  "Saturn’s moon Titan has rivers and lakes — but they’re made of liquid methane, not water.",
-  "One day on the Moon is about 29 Earth days long.",
-  "The Sun's core is about 27 million °F — it fuses 600 million tons of hydrogen every second.",
-  "The Kuiper Belt is a ring of icy objects beyond Neptune — Pluto hangs out there.",
-  "You could fit 1.3 million Earths inside the Sun.",
-  "It rains sulfuric acid on Venus — and the pressure would crush you flat.",
-  "A year on Neptune is 165 Earth years long.",
-  "The Milky Way galaxy is about 100,000 light-years across.",
-  "There’s a giant storm on Jupiter called the Great Red Spot — it’s bigger than Earth and has raged for centuries.",
-  "Astronauts can grow up to 2 inches taller in microgravity (their spines decompress).",
-  "You can’t burp in space — no gravity means gas doesn’t separate from liquids in your stomach.",
-  "The Hubble Space Telescope can see galaxies more than 13 billion light-years away.",
-  "The universe is expanding — and the farther away a galaxy is, the faster it’s moving away.",
-  "Some rogue planets just drift through space without orbiting a star.",
-  "Black holes can warp time — near the event horizon, time passes slower.",
-  "There's a huge hexagon-shaped storm at Saturn's north pole.",
-  "In 1977, we launched the Voyager probes — they’re still flying, and one has left the solar system.",
-  "Earth’s magnetic field protects us from deadly solar radiation — and creates the auroras.",
-  "Some stars explode in supernovas and create elements like gold, iron, and uranium.",
-  "There’s a comet named Halley that’s visible from Earth every 76 years — next up is 2061.",
-  "The Moon has moonquakes — some strong enough to last for 10 minutes.",
-  "The largest known star, UY Scuti, is over 1,700 times the diameter of the Sun.",
-  "If two neutron stars crash into each other, they can create a black hole — and ripples in space-time.",
-  "There’s a moon of Saturn, Enceladus, that shoots ice geysers into space — it might have an ocean beneath its crust.",
-  "Solar flares can knock out satellites and power grids on Earth.",
-  "The ISS orbits Earth every 90 minutes — astronauts see 16 sunrises and sunsets a day.",
-  "If you shouted in space, no one would hear you — there’s no air for sound to travel through.",
-  "The James Webb Space Telescope can see infrared light — basically heat — from distant galaxies.",
-  "In 2020, scientists discovered a possible radio signal from Proxima Centauri — our closest stellar neighbor.",
-  "There's a planet made of diamond (probably) — it’s called 55 Cancri e.",
-  "The early universe was just hydrogen, helium, and darkness — stars had to light things up.",
-  "Comets have tails that always point *away* from the Sun, no matter what direction they’re moving.",
-  "Some galaxies are shaped like spirals, others like blobs, and some like exploding fireworks.",
-  "The Sun flips its magnetic poles every 11 years — like a solar reset button.",
-  "Without a spacesuit, you'd die in space in less than a minute — not from cold, but from lack of pressure.",
-  "Your GPS only works because satellites constantly account for Einstein’s theory of relativity.",
-  "Mars has seasons, polar ice caps, and dust storms that can cover the whole planet.",
-  "The Moon was probably formed when something the size of Mars slammed into Earth.",
-  "It takes 225 million years for the Sun to orbit once around the Milky Way.",
+      "A teaspoon of neutron star would weigh about a billion tons — no, seriously.",
+      "The Sun accounts for 99.8% of the mass in the solar system.",
+      "Jupiter is so big you could fit all the other planets inside it — and still have room left.",
+      "Saturn's rings look solid but they're made of billions of ice chunks, some as small as pebbles.",
+      "Mars has the tallest volcano in the solar system — Olympus Mons — nearly 3x the height of Mount Everest.",
+      "The Moon is slowly drifting away from Earth — about 1.5 inches per year.",
+      "Uranus rotates on its side — its tilt is so extreme, it basically rolls around the Sun.",
+      "Mercury has almost no atmosphere, so its surface temperature swings 1000°F between day and night.",
+      "Pluto has mountains made of ice, and it may have a subsurface ocean.",
+      "In space, metal pieces can weld together without heat — it's called cold welding.",
+      "A day on Jupiter is only about 10 hours long — fastest spinner in the solar system.",
+      "Earth is the only planet known to have plate tectonics (and life, of course).",
+      "Saturn's moon Titan has rivers and lakes — but they're made of liquid methane, not water.",
+      "One day on the Moon is about 29 Earth days long.",
+      "The Sun's core is about 27 million °F — it fuses 600 million tons of hydrogen every second.",
+      "The Kuiper Belt is a ring of icy objects beyond Neptune — Pluto hangs out there.",
+      "You could fit 1.3 million Earths inside the Sun.",
+      "It rains sulfuric acid on Venus — and the pressure would crush you flat.",
+      "A year on Neptune is 165 Earth years long.",
+      "The Milky Way galaxy is about 100,000 light-years across.",
+      "There's a giant storm on Jupiter called the Great Red Spot — it's bigger than Earth and has raged for centuries.",
+      "Astronauts can grow up to 2 inches taller in microgravity (their spines decompress).",
+      "You can't burp in space — no gravity means gas doesn't separate from liquids in your stomach.",
+      "The Hubble Space Telescope can see galaxies more than 13 billion light-years away.",
+      "The universe is expanding — and the farther away a galaxy is, the faster it's moving away.",
+      "Some rogue planets just drift through space without orbiting a star.",
+      "Black holes can warp time — near the event horizon, time passes slower.",
+      "There's a huge hexagon-shaped storm at Saturn's north pole.",
+      "In 1977, we launched the Voyager probes — they're still flying, and one has left the solar system.",
+      "Earth's magnetic field protects us from deadly solar radiation — and creates the auroras.",
+      "Some stars explode in supernovas and create elements like gold, iron, and uranium.",
+      "There's a comet named Halley that's visible from Earth every 76 years — next up is 2061.",
+      "The Moon has moonquakes — some strong enough to last for 10 minutes.",
+      "The largest known star, UY Scuti, is over 1,700 times the diameter of the Sun.",
+      "If two neutron stars crash into each other, they can create a black hole — and ripples in space-time.",
+      "There's a moon of Saturn, Enceladus, that shoots ice geysers into space — it might have an ocean beneath its crust.",
+      "Solar flares can knock out satellites and power grids on Earth.",
+      "The ISS orbits Earth every 90 minutes — astronauts see 16 sunrises and sunsets a day.",
+      "If you shouted in space, no one would hear you — there's no air for sound to travel through.",
+      "The James Webb Space Telescope can see infrared light — basically heat — from distant galaxies.",
+      "In 2020, scientists discovered a possible radio signal from Proxima Centauri — our closest stellar neighbor.",
+      "There's a planet made of diamond (probably) — it's called 55 Cancri e.",
+      "The early universe was just hydrogen, helium, and darkness — stars had to light things up.",
+      "Comets have tails that always point *away* from the Sun, no matter what direction they're moving.",
+      "Some galaxies are shaped like spirals, others like blobs, and some like exploding fireworks.",
+      "The Sun flips its magnetic poles every 11 years — like a solar reset button.",
+      "Without a spacesuit, you'd die in space in less than a minute — not from cold, but from lack of pressure.",
+      "Your GPS only works because satellites constantly account for Einstein's theory of relativity.",
+      "Mars has seasons, polar ice caps, and dust storms that can cover the whole planet.",
+      "The Moon was probably formed when something the size of Mars slammed into Earth.",
+      "It takes 225 million years for the Sun to orbit once around the Milky Way.",
       "You've earned <%= totalPoints %> points so far. Keep reaching for the stars!",
       "Achievement unlocked: Being awesome! Keep it up!"
     ];
 
     let lastFactIndex = -1;
 
-function rotateFacts() {
-  const factElement = document.getElementById('spaceFacts');
-  factElement.style.transition = 'opacity 0.5s';
-  factElement.style.opacity = '0';
+    function rotateFacts() {
+      const factElement = document.getElementById('spaceFacts');
+      factElement.style.transition = 'opacity 0.5s';
+      factElement.style.opacity = '0';
 
-  setTimeout(() => {
-    let newIndex;
-    do {
-      newIndex = Math.floor(Math.random() * spaceFacts.length);
-    } while (newIndex === lastFactIndex && spaceFacts.length > 1); // avoid repeat
+      setTimeout(() => {
+        let newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * spaceFacts.length);
+        } while (newIndex === lastFactIndex && spaceFacts.length > 1); // avoid repeat
 
-    lastFactIndex = newIndex;
+        lastFactIndex = newIndex;
 
-    factElement.textContent = spaceFacts[newIndex];
-    factElement.style.opacity = '1';
-  }, 500);
-}
+        factElement.textContent = spaceFacts[newIndex];
+        factElement.style.opacity = '1';
+      }, 500);
+    }
 
     // Start rotating facts
     rotateFacts();
     setInterval(rotateFacts, 45000);
+
+    // Calculate and display playing time and overall rank
+    function calculateStats() {
+      const studentData = <%- JSON.stringify(studentData) %>;
+      const welcomeAchievementId = "welcome_aboard";
+      
+      // Calculate playing time based on "Welcome Aboard!" achievement or fallback to dateAdded
+      let playingTime = "New";
+      let startDate = null;
+      
+      // First try to get the welcome achievement date
+      if (studentData.achievementDates && studentData.achievementDates[welcomeAchievementId]) {
+        startDate = new Date(studentData.achievementDates[welcomeAchievementId]);
+      }
+      // Fallback to student creation date if they have the welcome achievement but no date tracking
+      else if (studentData.unlocked && studentData.unlocked.includes(welcomeAchievementId) && studentData.dateAdded) {
+        startDate = new Date(studentData.dateAdded);
+      }
+      
+      if (startDate) {
+        const now = new Date();
+        const diffTime = Math.abs(now - startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        playingTime = diffDays;
+      }
+      
+      document.getElementById('playingTime').textContent = playingTime;
+      
+      // Calculate overall rank (this would need to be passed from server)
+      // For now, we'll use a placeholder
+      const overallRank = <%= studentRank || 'N/A' %>;
+      document.getElementById('overallRank').textContent = overallRank;
+    }
+
+    // Run calculations
+    calculateStats();
 
     // Create particle effects
     function createParticle() {
@@ -562,6 +317,10 @@ function rotateFacts() {
         0%, 100% { transform: translateX(0); }
         25% { transform: translateX(-10px); }
         75% { transform: translateX(10px); }
+      }
+      @keyframes eliteShine {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
       }
     `;
     document.head.appendChild(style);
@@ -707,11 +466,6 @@ function rotateFacts() {
       observer.observe(card);
     });
 
-    // Add floating animation to badges
-    document.querySelectorAll('.badge').forEach((badge, index) => {
-      badge.style.animation = `float ${3 + index * 0.5}s ease-in-out infinite`;
-      badge.style.animationDelay = `${index * 0.2}s`;
-    });
 
     // Create floating stars effect in background
     function createBackgroundStar() {

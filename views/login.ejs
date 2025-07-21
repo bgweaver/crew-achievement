@@ -4,358 +4,16 @@
   <title>Valiant Inquiry - Crew Login</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;600;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
-  <style>
-    /* Enhanced Space Theme CSS - Ultra Cool Edition */
-    /* Root variables for consistent theming */
-    :root {
-      --space-dark: #0a0a1a;
-      --space-medium: #1a1a40;
-      --space-light: #2e2e6e;
-      --space-accent: #4b6ef5;
-      --space-secondary: #6c5ce7;
-      --space-gold: #ffd700;
-      --space-silver: #c0c0c0;
-      --space-bronze: #cd7f32;
-      --text-primary: #ffffff;
-      --text-secondary: #e0e0f0;
-      --text-muted: #a0a0c0;
-      --success: #28c76f;
-      --warning: #ff9f43;
-      --danger: #ea5455;
-      --info: #00cfe8;
-      --glow: 0 0 20px rgba(75, 110, 245, 0.3);
-      --glow-strong: 0 0 30px rgba(75, 110, 245, 0.5);
-      --neon-pink: #ff006e;
-      --neon-cyan: #00ffff;
-      --neon-green: #39ff14;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, var(--space-dark) 0%, var(--space-medium) 50%, var(--space-light) 100%);
-      color: var(--text-primary);
-      min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    /* Login container styling */
-    .login-container {
-      background: rgba(46, 46, 110, 0.4);
-      border: 2px solid var(--space-accent);
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      box-shadow: var(--glow-strong);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .form-control {
-      background: rgba(26, 26, 64, 0.8);
-      border: 2px solid var(--space-accent);
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-size: 1.1rem;
-      padding: 15px 20px;
-      transition: all 0.3s ease;
-    }
-
-    .form-control:focus {
-      background: rgba(26, 26, 64, 0.9);
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-      color: var(--text-primary);
-    }
-
-    .form-control::placeholder {
-      color: var(--text-muted);
-    }
-
-    .btn-primary {
-      background: linear-gradient(45deg, var(--space-accent), var(--space-secondary));
-      border: none;
-      border-radius: 10px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      padding: 15px 30px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      box-shadow: var(--glow);
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(45deg, var(--space-secondary), var(--space-accent));
-      box-shadow: var(--glow-strong);
-      transform: translateY(-2px);
-    }
-
-    .team-standings {
-      background: rgba(46, 46, 110, 0.3);
-      border: 2px solid var(--space-accent);
-      border-radius: 15px;
-      backdrop-filter: blur(5px);
-      box-shadow: var(--glow);
-    }
-
-    .team-item {
-      background: rgba(26, 26, 64, 0.6);
-      border: 1px solid var(--space-light);
-      border-radius: 8px;
-      margin-bottom: 10px;
-      transition: all 0.3s ease;
-    }
-
-    .team-item:hover {
-      background: rgba(26, 26, 64, 0.8);
-      transform: translateX(5px);
-      box-shadow: var(--glow);
-    }
-
-    /* Additional login-specific styles */
-
-    @keyframes titleGlow {
-      0%, 100% { 
-        text-shadow: 
-          0 0 20px rgba(75, 110, 245, 0.8),
-          0 0 40px rgba(0, 255, 255, 0.5),
-          0 0 60px rgba(255, 0, 110, 0.3);
-      }
-      50% { 
-        text-shadow: 
-          0 0 30px rgba(75, 110, 245, 1),
-          0 0 50px rgba(0, 255, 255, 0.7),
-          0 0 70px rgba(255, 0, 110, 0.5);
-      }
-    }
-
-    .subtitle {
-      font-family: "Rajdhani", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-      font-size: 1.2rem;
-      color: var(--neon-cyan);
-      text-shadow: 0 0 10px var(--neon-cyan);
-      letter-spacing: 3px;
-      margin-bottom: 30px;
-      animation: subtitlePulse 2s ease-in-out infinite;
-    }
-
-    @keyframes subtitlePulse {
-      0%, 100% { opacity: 0.8; }
-      50% { opacity: 1; }
-    }
-
-    .login-form {
-      position: relative;
-      padding-top: 50px;
-    }
-
-    .auth-required {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.8rem;
-      color: var(--warning);
-      letter-spacing: 3px;
-      font-family: 'Orbitron', sans-serif;
-      text-shadow: 0 0 10px var(--warning);
-      animation: blink 1s ease-in-out infinite;
-      white-space: nowrap;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .space-grid {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        linear-gradient(rgba(75, 110, 245, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(75, 110, 245, 0.1) 1px, transparent 1px);
-      background-size: 50px 50px;
-      z-index: -3;
-      animation: gridMove 20s linear infinite;
-    }
-
-    @keyframes gridMove {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(50px, 50px); }
-    }
-
-    .planet {
-      position: fixed;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      z-index: -2;
-      overflow: hidden;
-    }
-
-    .planet-1 {
-      top: 10%;
-      right: 10%;
-      background: radial-gradient(circle at 30% 30%, var(--space-accent), var(--space-dark));
-      box-shadow: 
-        0 0 50px rgba(75, 110, 245, 0.5),
-        inset -20px -20px 40px rgba(0, 0, 0, 0.5);
-      animation: float 20s ease-in-out infinite;
-    }
-
-    .planet-2 {
-      bottom: 10%;
-      left: 5%;
-      width: 100px;
-      height: 100px;
-      background: radial-gradient(circle at 40% 40%, var(--neon-pink), var(--space-dark));
-      box-shadow: 
-        0 0 40px rgba(255, 0, 110, 0.5),
-        inset -15px -15px 30px rgba(0, 0, 0, 0.5);
-      animation: float 25s ease-in-out infinite reverse;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
-    }
-
-    .team-preview {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-
-    .team-card {
-      background: rgba(46, 46, 110, 0.6);
-      border: 2px solid transparent;
-      border-radius: 10px;
-      padding: 15px;
-      text-align: center;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .team-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, currentColor, transparent);
-      opacity: 0.1;
-      animation: teamPulse 3s ease-in-out infinite;
-    }
-
-    @keyframes teamPulse {
-      0%, 100% { transform: scale(0.8); }
-      50% { transform: scale(1.2); }
-    }
-
-    .team-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .team-red { border-color: #ff0040; color: #ff0040; }
-    .team-blue { border-color: #0080ff; color: #0080ff; }
-    .team-green { border-color: #00ff40; color: #00ff40; }
-    .team-yellow { border-color: #ffff00; color: #ffff00; }
-
-    .team-red:hover { box-shadow: 0 10px 30px rgba(255, 0, 64, 0.5); }
-    .team-blue:hover { box-shadow: 0 10px 30px rgba(0, 128, 255, 0.5); }
-    .team-green:hover { box-shadow: 0 10px 30px rgba(0, 255, 64, 0.5); }
-    .team-yellow:hover { box-shadow: 0 10px 30px rgba(255, 255, 0, 0.5); }
-
-    .security-scanner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-      z-index: -1;
-      animation: scan 3s linear infinite;
-    }
-
-    @keyframes scan {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(100vh); }
-    }
-
-    .hologram-effect {
-      position: relative;
-    }
-
-    .hologram-effect::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: 
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 2px,
-          rgba(0, 255, 255, 0.03) 2px,
-          rgba(0, 255, 255, 0.03) 4px
-        );
-      pointer-events: none;
-      animation: hologramGlitch 5s ease-in-out infinite;
-    }
-
-    @keyframes hologramGlitch {
-      0%, 100% { opacity: 0.05; }
-      50% { opacity: 0.1; }
-    }
-
-    .space-facts {
-      padding: 15px 20px;
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      font-style: italic;
-      z-index: 100;
-      transition: opacity 1s ease-in-out;
-    }
-
-
-.space-station-title {
-  font-family: 'Audiowide', sans-serif;
-  font-size: 3rem;
-  font-weight: 900;
-  color: var(--text-primary);
-  text-shadow:
-    0 0 8px rgba(75, 110, 245, 0.5),
-    0 0 15px rgba(0, 255, 255, 0.3),
-    0 0 25px rgba(255, 0, 110, 0.15);
-  animation: titleGlow 3s ease-in-out infinite;
-  margin-bottom: 20px;
-  letter-spacing: 2px;
+</head>
+<style>
+  input::placeholder {
+  color: rgba(230, 230, 230, 0.4);
 }
 
-  </style>
-</head>
+</style>
 <body>
   <!-- Background effects -->
   <div class="space-grid"></div>
@@ -371,12 +29,12 @@
             <h1 class="space-station-title">M.O.S. VALIANT INQUIRY</h1>
             <p class="subtitle mb-3">Observe. Question. Explore.</p>
             <div class="mb-2">
-              <small style="color: white;">Stardate: <%= new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></small>
+              <small class="stardate">Stardate: <%= new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></small>
             </div>
           </div>
 
           <% if (error) { %>
-            <div class="alert alert-danger animate__animated animate__shakeX" style="background: rgba(234, 84, 85, 0.9); border: 2px solid var(--danger);">
+            <div class="alert alert-danger login-error">
               <i class="fas fa-exclamation-triangle"></i> <%= error %>
             </div>
           <% } %>
@@ -385,12 +43,12 @@
             <div class="auth-required">AUTHENTICATION REQUIRED</div>
             <div class="mb-4">
               <label for="pseudonym" class="form-label fs-5">👤 Username</label>
-              <input type="text" class="form-control form-control-lg" id="pseudonym" name="pseudonym" required 
+              <input type="text" class="form-control form-control-lg text-white" id="pseudonym" name="pseudonym" required 
                      placeholder="Enter your crew identifier" autocomplete="off">
             </div>
             <div class="mb-4">
               <label for="pin" class="form-label fs-5">🔒 Access Code</label>
-              <input type="password" class="form-control form-control-lg" id="pin" name="pin" required 
+              <input type="password" class="form-control form-control-lg text-white" id="pin" name="pin" required 
                      placeholder="4-digit security PIN" maxlength="4" pattern="[0-9]{4}">
             </div>
             <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
@@ -399,9 +57,9 @@
           </form>
 
           <div class="text-center">
-            <small style="color: white;">
+            <small class="login-footer-text">
               Forgot your access information? Ask your commanding officer.<br>
-              <a href="/admin-login" class="text-decoration-none" style="color: var(--space-accent);">
+              <a href="/admin-login" class="text-decoration-none admin-link">
                 Officers' Access Portal
               </a>
             </small>
@@ -410,7 +68,7 @@
 
         <% if (Object.keys(teamScores).length > 0) { %>
           <div class="team-standings p-4 mt-5 mb-3">
-            <h3 class="text-center mb-4" style="color: var(--neon-cyan); text-shadow: 0 0 20px var(--neon-cyan);">
+            <h3 class="text-center mb-4 team-rankings-title">
               CREW RANKINGS
             </h3>
             
@@ -437,12 +95,12 @@
               %>
                 <div class="list-group-item team-item d-flex justify-content-between align-items-center text-white">
                   <div>
-                    <span class="badge bg-<%= index === 0 ? 'warning' : index === 1 ? 'secondary' : index === 2 ? 'info' : 'dark' %> me-2">
+                    <span class="badge ranking-badge me-2">
                       <%= index + 1 %>
                     </span>
                     <span class="fs-5"><%= team %> Crew</span>
                   </div>
-                  <span class="badge bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %> fs-6">
+                  <span class="badge team-score-badge bg-<%= team === 'Red' ? 'danger' : team === 'Blue' ? 'primary' : team === 'Green' ? 'success' : 'warning' %> fs-6">
                     <%= score %> pts
                   </span>
                 </div>
@@ -455,7 +113,7 @@
   </div>
 
   <!-- Fun space facts that rotate -->
-  <div class="space-facts mb-5 mt-3" id="spaceFacts">
+  <div class="space-facts" id="spaceFacts">
     Loading cosmic wisdom...
   </div>
 
@@ -463,80 +121,79 @@
   <script>
     // Space facts to display
     const spaceFacts = [
-  "Venus spins backwards and super slowly — one day on Venus is longer than its year.",
-  "A teaspoon of neutron star would weigh about a billion tons — no, seriously.",
-  "The Sun accounts for 99.8% of the mass in the solar system.",
-  "Jupiter is so big you could fit all the other planets inside it — and still have room left.",
-  "Saturn’s rings look solid but they’re made of billions of ice chunks, some as small as pebbles.",
-  "Mars has the tallest volcano in the solar system — Olympus Mons — nearly 3x the height of Mount Everest.",
-  "The Moon is slowly drifting away from Earth — about 1.5 inches per year.",
-  "Uranus rotates on its side — its tilt is so extreme, it basically rolls around the Sun.",
-  "Mercury has almost no atmosphere, so its surface temperature swings 1000°F between day and night.",
-  "Pluto has mountains made of ice, and it may have a subsurface ocean.",
-  "In space, metal pieces can weld together without heat — it's called cold welding.",
-  "A day on Jupiter is only about 10 hours long — fastest spinner in the solar system.",
-  "Earth is the only planet known to have plate tectonics (and life, of course).",
-  "Saturn’s moon Titan has rivers and lakes — but they’re made of liquid methane, not water.",
-  "One day on the Moon is about 29 Earth days long.",
-  "The Sun's core is about 27 million °F — it fuses 600 million tons of hydrogen every second.",
-  "The Kuiper Belt is a ring of icy objects beyond Neptune — Pluto hangs out there.",
-  "You could fit 1.3 million Earths inside the Sun.",
-  "It rains sulfuric acid on Venus — and the pressure would crush you flat.",
-  "A year on Neptune is 165 Earth years long.",
-  "The Milky Way galaxy is about 100,000 light-years across.",
-  "There’s a giant storm on Jupiter called the Great Red Spot — it’s bigger than Earth and has raged for centuries.",
-  "Astronauts can grow up to 2 inches taller in microgravity (their spines decompress).",
-  "You can’t burp in space — no gravity means gas doesn’t separate from liquids in your stomach.",
-  "The Hubble Space Telescope can see galaxies more than 13 billion light-years away.",
-  "The universe is expanding — and the farther away a galaxy is, the faster it’s moving away.",
-  "Some rogue planets just drift through space without orbiting a star.",
-  "Black holes can warp time — near the event horizon, time passes slower.",
-  "There's a huge hexagon-shaped storm at Saturn's north pole.",
-  "In 1977, we launched the Voyager probes — they’re still flying, and one has left the solar system.",
-  "Earth’s magnetic field protects us from deadly solar radiation — and creates the auroras.",
-  "Some stars explode in supernovas and create elements like gold, iron, and uranium.",
-  "There’s a comet named Halley that’s visible from Earth every 76 years — next up is 2061.",
-  "The Moon has moonquakes — some strong enough to last for 10 minutes.",
-  "The largest known star, UY Scuti, is over 1,700 times the diameter of the Sun.",
-  "If two neutron stars crash into each other, they can create a black hole — and ripples in space-time.",
-  "There’s a moon of Saturn, Enceladus, that shoots ice geysers into space — it might have an ocean beneath its crust.",
-  "Solar flares can knock out satellites and power grids on Earth.",
-  "The ISS orbits Earth every 90 minutes — astronauts see 16 sunrises and sunsets a day.",
-  "If you shouted in space, no one would hear you — there’s no air for sound to travel through.",
-  "The James Webb Space Telescope can see infrared light — basically heat — from distant galaxies.",
-  "In 2020, scientists discovered a possible radio signal from Proxima Centauri — our closest stellar neighbor.",
-  "There's a planet made of diamond (probably) — it’s called 55 Cancri e.",
-  "The early universe was just hydrogen, helium, and darkness — stars had to light things up.",
-  "Comets have tails that always point *away* from the Sun, no matter what direction they’re moving.",
-  "Some galaxies are shaped like spirals, others like blobs, and some like exploding fireworks.",
-  "The Sun flips its magnetic poles every 11 years — like a solar reset button.",
-  "Without a spacesuit, you'd die in space in less than a minute — not from cold, but from lack of pressure.",
-  "Your GPS only works because satellites constantly account for Einstein’s theory of relativity.",
-  "Mars has seasons, polar ice caps, and dust storms that can cover the whole planet.",
-  "The Moon was probably formed when something the size of Mars slammed into Earth.",
-  "It takes 225 million years for the Sun to orbit once around the Milky Way."
-];
-
+      "Venus spins backwards and super slowly — one day on Venus is longer than its year.",
+      "A teaspoon of neutron star would weigh about a billion tons — no, seriously.",
+      "The Sun accounts for 99.8% of the mass in the solar system.",
+      "Jupiter is so big you could fit all the other planets inside it — and still have room left.",
+      "Saturn's rings look solid but they're made of billions of ice chunks, some as small as pebbles.",
+      "Mars has the tallest volcano in the solar system — Olympus Mons — nearly 3x the height of Mount Everest.",
+      "The Moon is slowly drifting away from Earth — about 1.5 inches per year.",
+      "Uranus rotates on its side — its tilt is so extreme, it basically rolls around the Sun.",
+      "Mercury has almost no atmosphere, so its surface temperature swings 1000°F between day and night.",
+      "Pluto has mountains made of ice, and it may have a subsurface ocean.",
+      "In space, metal pieces can weld together without heat — it's called cold welding.",
+      "A day on Jupiter is only about 10 hours long — fastest spinner in the solar system.",
+      "Earth is the only planet known to have plate tectonics (and life, of course).",
+      "Saturn's moon Titan has rivers and lakes — but they're made of liquid methane, not water.",
+      "One day on the Moon is about 29 Earth days long.",
+      "The Sun's core is about 27 million °F — it fuses 600 million tons of hydrogen every second.",
+      "The Kuiper Belt is a ring of icy objects beyond Neptune — Pluto hangs out there.",
+      "You could fit 1.3 million Earths inside the Sun.",
+      "It rains sulfuric acid on Venus — and the pressure would crush you flat.",
+      "A year on Neptune is 165 Earth years long.",
+      "The Milky Way galaxy is about 100,000 light-years across.",
+      "There's a giant storm on Jupiter called the Great Red Spot — it's bigger than Earth and has raged for centuries.",
+      "Astronauts can grow up to 2 inches taller in microgravity (their spines decompress).",
+      "You can't burp in space — no gravity means gas doesn't separate from liquids in your stomach.",
+      "The Hubble Space Telescope can see galaxies more than 13 billion light-years away.",
+      "The universe is expanding — and the farther away a galaxy is, the faster it's moving away.",
+      "Some rogue planets just drift through space without orbiting a star.",
+      "Black holes can warp time — near the event horizon, time passes slower.",
+      "There's a huge hexagon-shaped storm at Saturn's north pole.",
+      "In 1977, we launched the Voyager probes — they're still flying, and one has left the solar system.",
+      "Earth's magnetic field protects us from deadly solar radiation — and creates the auroras.",
+      "Some stars explode in supernovas and create elements like gold, iron, and uranium.",
+      "There's a comet named Halley that's visible from Earth every 76 years — next up is 2061.",
+      "The Moon has moonquakes — some strong enough to last for 10 minutes.",
+      "The largest known star, UY Scuti, is over 1,700 times the diameter of the Sun.",
+      "If two neutron stars crash into each other, they can create a black hole — and ripples in space-time.",
+      "There's a moon of Saturn, Enceladus, that shoots ice geysers into space — it might have an ocean beneath its crust.",
+      "Solar flares can knock out satellites and power grids on Earth.",
+      "The ISS orbits Earth every 90 minutes — astronauts see 16 sunrises and sunsets a day.",
+      "If you shouted in space, no one would hear you — there's no air for sound to travel through.",
+      "The James Webb Space Telescope can see infrared light — basically heat — from distant galaxies.",
+      "In 2020, scientists discovered a possible radio signal from Proxima Centauri — our closest stellar neighbor.",
+      "There's a planet made of diamond (probably) — it's called 55 Cancri e.",
+      "The early universe was just hydrogen, helium, and darkness — stars had to light things up.",
+      "Comets have tails that always point *away* from the Sun, no matter what direction they're moving.",
+      "Some galaxies are shaped like spirals, others like blobs, and some like exploding fireworks.",
+      "The Sun flips its magnetic poles every 11 years — like a solar reset button.",
+      "Without a spacesuit, you'd die in space in less than a minute — not from cold, but from lack of pressure.",
+      "Your GPS only works because satellites constantly account for Einstein's theory of relativity.",
+      "Mars has seasons, polar ice caps, and dust storms that can cover the whole planet.",
+      "The Moon was probably formed when something the size of Mars slammed into Earth.",
+      "It takes 225 million years for the Sun to orbit once around the Milky Way."
+    ];
 
     let lastFactIndex = -1;
 
-function rotateFacts() {
-  const factElement = document.getElementById('spaceFacts');
-  factElement.style.transition = 'opacity 0.5s';
-  factElement.style.opacity = '0';
+    function rotateFacts() {
+      const factElement = document.getElementById('spaceFacts');
+      factElement.style.transition = 'opacity 0.5s';
+      factElement.style.opacity = '0';
 
-  setTimeout(() => {
-    let newIndex;
-    do {
-      newIndex = Math.floor(Math.random() * spaceFacts.length);
-    } while (newIndex === lastFactIndex && spaceFacts.length > 1); // avoid repeat
+      setTimeout(() => {
+        let newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * spaceFacts.length);
+        } while (newIndex === lastFactIndex && spaceFacts.length > 1); // avoid repeat
 
-    lastFactIndex = newIndex;
+        lastFactIndex = newIndex;
 
-    factElement.textContent = spaceFacts[newIndex];
-    factElement.style.opacity = '1';
-  }, 500);
-}
+        factElement.textContent = spaceFacts[newIndex];
+        factElement.style.opacity = '1';
+      }, 500);
+    }
 
     // Start rotating facts
     rotateFacts();
