@@ -16,6 +16,40 @@
   color: rgba(230, 230, 230, 0.4) !important;
   opacity: 1 !important;
 }
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.online {
+  background: #28a745;
+  box-shadow: 0 0 10px #28a745;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.offline {
+  background: #dc3545;
+  box-shadow: 0 0 10px #dc3545;
+}
+
+.status-indicator.testing {
+  background: #ffc107;
+  box-shadow: 0 0 10px #ffc107;
+  animation: blink 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
 
   </style>
 </head>
@@ -43,6 +77,9 @@
     <li class="nav-item">
       <a class="nav-link <% if (view === 'bulk') { %>active<% } %>" href="/admin?view=bulk">Bulk Actions</a>
     </li>
+    <li class="nav-item">
+  <a class="nav-link <% if (view === 'mission') { %>active<% } %>" href="/admin?view=mission">Mission Control</a>
+</li>
   </ul>
 
   <% if (view === 'manage' || !view) { %>
@@ -406,6 +443,277 @@
       </div>
     </div>
   <% } %>
+
+  <% if (view === 'mission') { %>
+  <!-- Mission Control Section -->
+  <h2>🚀 Mission Control</h2>
+  
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5>Ship AI Configuration</h5>
+        </div>
+        <div class="card-body">
+          <form id="missionForm">
+            <div class="row g-3 text-white">
+              <div class="col-12">
+                <label class="form-label">Current Mission</label>
+                <input type="text" id="currentMission" class="form-control" 
+                       placeholder="e.g., Explore the Andromeda Sector and collect stellar data">
+              </div>
+              
+              <div class="col-12">
+                <label class="form-label">Mission Briefing</label>
+                <textarea id="missionBriefing" class="form-control" rows="3" 
+                          placeholder="Describe the overall mission and objectives for students"></textarea>
+              </div>
+              
+              <div class="col-12">
+                <label class="form-label">Ship Status</label>
+                <input type="text" id="shipStatus" class="form-control" 
+                       placeholder="e.g., All systems operational. Ready for deep space exploration.">
+              </div>
+              
+              <div class="col-12">
+                <button type="submit" class="btn btn-success">Update Mission Parameters</button>
+                <button type="button" class="btn btn-secondary ms-2" onclick="loadMissionData()">Reload Current Data</button>
+              </div>
+            </div>
+          </form>
+          
+          <div id="missionUpdateStatus" class="mt-3" style="display: none;"></div>
+        </div>
+      </div>
+      
+      <div class="card mt-4">
+        <div class="card-header">
+          <h5>AI Safety & Content Filters</h5>
+        </div>
+        <div class="card-body text-white">
+          <div class="alert alert-info">
+            <h6>🛡️ Current Safety Measures:</h6>
+            <ul class="mb-0">
+              <li><strong>Content Filter:</strong> Blocks inappropriate language and topics</li>
+              <li><strong>Topic Restriction:</strong> Only discusses space, astronomy, and current mission</li>
+              <li><strong>Age Appropriate:</strong> Language suitable for 5th grade students (age 10-11)</li>
+              <li><strong>Response Limit:</strong> Maximum 120 words per response</li>
+              <li><strong>Forbidden Topics:</strong> Violence, personal information, non-educational content</li>
+            </ul>
+          </div>
+          
+          <div class="mt-3">
+            <h6>Safe Topics the AI will discuss:</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <ul class="text-success">
+                  <li>Planets and moons</li>
+                  <li>Stars and galaxies</li>
+                  <li>Spacecraft and rockets</li>
+                  <li>Astronauts and space missions</li>
+                  <li>Solar system facts</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <ul class="text-success">
+                  <li>Space exploration</li>
+                  <li>Astronomy concepts</li>
+                  <li>Current mission objectives</li>
+                  <li>Space technology</li>
+                  <li>Fun space facts</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>AI Status Monitor</h5>
+        </div>
+        <div class="card-body text-white">
+          <div class="d-flex align-items-center mb-3">
+            <div class="status-indicator me-2" id="aiStatusIndicator"></div>
+            <span id="aiStatusText">Checking AI status...</span>
+          </div>
+          
+          <button class="btn btn-outline-info w-100 mb-3" onclick="testAiConnection()">Test AI Connection</button>
+          
+          <div id="aiTestResult" style="display: none;"></div>
+          
+          <hr>
+          
+          <h6>Quick Test Messages:</h6>
+          <div class="d-grid gap-2">
+            <button class="btn btn-sm btn-outline-primary" onclick="sendTestMessage('What is Mars?')">
+              Test: "What is Mars?"
+            </button>
+            <button class="btn btn-sm btn-outline-primary" onclick="sendTestMessage('Tell me about our mission')">
+              Test: "Tell me about our mission"
+            </button>
+            <button class="btn btn-sm btn-outline-warning" onclick="sendTestMessage('What is homework?')">
+              Test: Forbidden Topic
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card mt-3">
+        <div class="card-header">
+          <h5>Usage Statistics</h5>
+        </div>
+        <div class="card-body text-white">
+          <p><small class="text-muted">Chat usage statistics would appear here when implemented:</small></p>
+          <ul class="text-muted">
+            <li>Total conversations today</li>
+            <li>Most active students</li>
+            <li>Popular topics</li>
+            <li>Blocked content attempts</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<script>
+// Add this JavaScript to the existing script section in admin.ejs
+
+// Mission Control Functions
+async function loadMissionData() {
+  try {
+    const response = await fetch('/admin/mission');
+    const data = await response.json();
+    
+    document.getElementById('currentMission').value = data.currentMission || '';
+    document.getElementById('missionBriefing').value = data.missionBriefing || '';
+    document.getElementById('shipStatus').value = data.shipStatus || '';
+    
+    showMissionStatus('Mission data loaded successfully', 'success');
+  } catch (error) {
+    console.error('Error loading mission data:', error);
+    showMissionStatus('Error loading mission data', 'error');
+  }
+}
+
+// Mission form submission
+document.getElementById('missionForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const formData = {
+    currentMission: document.getElementById('currentMission').value,
+    missionBriefing: document.getElementById('missionBriefing').value,
+    shipStatus: document.getElementById('shipStatus').value
+  };
+  
+  try {
+    const response = await fetch('/admin/mission', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showMissionStatus('Mission parameters updated successfully! Students will see the new information when they chat with the AI.', 'success');
+    } else {
+      showMissionStatus('Error updating mission parameters', 'error');
+    }
+  } catch (error) {
+    console.error('Error updating mission:', error);
+    showMissionStatus('Error updating mission parameters', 'error');
+  }
+});
+
+function showMissionStatus(message, type) {
+  const statusDiv = document.getElementById('missionUpdateStatus');
+  statusDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'}`;
+  statusDiv.textContent = message;
+  statusDiv.style.display = 'block';
+  
+  setTimeout(() => {
+    statusDiv.style.display = 'none';
+  }, 5000);
+}
+
+// AI Connection Testing
+async function testAiConnection() {
+  const indicator = document.getElementById('aiStatusIndicator');
+  const statusText = document.getElementById('aiStatusText');
+  const resultDiv = document.getElementById('aiTestResult');
+  
+  indicator.className = 'status-indicator testing';
+  statusText.textContent = 'Testing AI connection...';
+  resultDiv.style.display = 'none';
+  
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'System test: Are you operational?',
+        pseudonym: 'Admin Test'
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.response) {
+      indicator.className = 'status-indicator online';
+      statusText.textContent = 'AI Online - Connection Successful';
+      resultDiv.innerHTML = `<div class="alert alert-success"><strong>AI Response:</strong> ${data.response}</div>`;
+      resultDiv.style.display = 'block';
+    } else {
+      throw new Error('No response from AI');
+    }
+  } catch (error) {
+    indicator.className = 'status-indicator offline';
+    statusText.textContent = 'AI Offline - Connection Failed';
+    resultDiv.innerHTML = `<div class="alert alert-danger"><strong>Error:</strong> ${error.message}</div>`;
+    resultDiv.style.display = 'block';
+  }
+}
+
+async function sendTestMessage(message) {
+  const resultDiv = document.getElementById('aiTestResult');
+  resultDiv.innerHTML = '<div class="alert alert-info">Sending test message...</div>';
+  resultDiv.style.display = 'block';
+  
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: message,
+        pseudonym: 'Admin Test'
+      })
+    });
+    
+    const data = await response.json();
+    
+    resultDiv.innerHTML = `
+      <div class="alert alert-info">
+        <strong>Test Message:</strong> "${message}"<br>
+        <strong>AI Response:</strong> ${data.response || 'No response'}
+      </div>
+    `;
+  } catch (error) {
+    resultDiv.innerHTML = `<div class="alert alert-danger"><strong>Error:</strong> ${error.message}</div>`;
+  }
+}
+
+// Load mission data when the mission tab is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.location.search.includes('view=mission')) {
+    loadMissionData();
+    testAiConnection();
+  }
+});
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>

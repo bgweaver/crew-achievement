@@ -6,9 +6,35 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const leoProfanity = require('leo-profanity');
 
 const app = express();
 const PORT = 3000;
+const missionPath = path.join(__dirname, "data", "mission.json");
+
+
+let activeRequests = 0;
+const MAX_CONCURRENT_REQUESTS = 3; // Only 3 AI requests at once
+const REQUEST_TIMEOUT = 15000; // 15 second timeout
+const RATE_LIMIT_WINDOW = 60000; // 1 minute window
+const REQUESTS_PER_MINUTE = 5; // Max 5 requests per student per minute
+
+// Track request rates per student
+const requestTracker = new Map();
+
+function cleanupOldRequests() {
+  const now = Date.now();
+  for (const [key, requests] of requestTracker.entries()) {
+    requestTracker.set(key, requests.filter(time => now - time < RATE_LIMIT_WINDOW));
+    if (requestTracker.get(key).length === 0) {
+      requestTracker.delete(key);
+    }
+  }
+}
+
+// Clean up every minute
+setInterval(cleanupOldRequests, 60000);
+
 
 // Session configuration
 app.set('trust proxy', 1);
@@ -247,6 +273,71 @@ function requireAdmin(req, res, next) {
   }
 }
 
+function loadMissionData() {
+  try {
+    if (!fs.existsSync(missionPath)) {
+      const defaultMission = {
+        currentMission: "Explore the outer rim of the galaxy and collect cosmic data.",
+        missionBriefing: "Your mission is to work together as a crew to unlock achievements and gain knowledge about space exploration.",
+        shipStatus: "All systems operational. Ready for deep space exploration.",
+        lastUpdated: new Date().toISOString()
+      };
+      fs.writeFileSync(missionPath, JSON.stringify(defaultMission, null, 2));
+    }
+    return JSON.parse(fs.readFileSync(missionPath, "utf8"));
+  } catch (error) {
+    console.error('Error loading mission data:', error);
+    return {
+      currentMission: "Explore the galaxy",
+      missionBriefing: "Learn about space",
+      shipStatus: "Systems operational"
+    };
+  }
+}
+
+// Content safety function
+function isContentSafe(message) {
+  const lowerMessage = message.toLowerCase();
+  
+  // Topics that are NOT allowed
+  const forbiddenTopics = [
+    'violence', 'weapon', 'gun', 'kill', 'death', 'die', 'hurt', 'pain',
+    'drug', 'alcohol', 'beer', 'wine', 'smoke', 'cigarette',
+    'sex', 'romantic', 'dating', 'boyfriend', 'girlfriend',
+    'politics', 'election', 'president', 'government', 'war',
+    'religion', 'god', 'jesus', 'muslim', 'christian', 'jewish',
+    'money', 'buy', 'sell', 'price', 'cost', 'expensive',
+    'school', 'teacher', 'homework', 'test', 'grade', 'class',
+    'home', 'house', 'family', 'mom', 'dad', 'parent',
+    'personal', 'private', 'secret', 'password', 'address'
+  ];
+  
+  // Check for forbidden topics
+  for (const topic of forbiddenTopics) {
+    if (lowerMessage.includes(topic)) {
+      return false;
+    }
+  }
+  
+  // Must be space-related
+  const spaceKeywords = [
+    'space', 'star', 'planet', 'galaxy', 'asteroid', 'comet', 'meteor',
+    'solar', 'moon', 'sun', 'earth', 'mars', 'jupiter', 'saturn',
+    'universe', 'cosmos', 'nebula', 'black hole', 'orbit', 'gravity',
+    'astronaut', 'spacecraft', 'rocket', 'satellite', 'mission',
+    'telescope', 'light year', 'constellation', 'milky way',
+    'venus', 'mercury', 'uranus', 'neptune', 'pluto',
+    'valiant', 'inquiry', 'ship', 'crew', 'achievement', 'mission'
+  ];
+  
+  const hasSpaceContent = spaceKeywords.some(keyword => 
+    lowerMessage.includes(keyword)
+  );
+  
+  return hasSpaceContent;
+}
+
+
 // Routes
 app.get("/", (req, res) => {
   const students = loadJSON(studentsPath);
@@ -255,6 +346,168 @@ app.get("/", (req, res) => {
   const teamScores = calculateBalancedTeamScores(students, achievements);
 
   res.render("login", { teamScores, error: null });
+});
+
+app.post('/api/chat', async (req, res) => {
+  if (!req.session.userId && !req.body.pseudonym) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  try {
+    const { message, pseudonym } = req.body;
+    
+    if (!message || message.trim().length === 0) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Rate limiting per student
+    const now = Date.now();
+    const studentRequests = requestTracker.get(pseudonym) || [];
+    const recentRequests = studentRequests.filter(time => now - time < RATE_LIMIT_WINDOW);
+    
+    if (recentRequests.length >= REQUESTS_PER_MINUTE) {
+      return res.json({
+        response: "Cadet, slow down there! Even my quantum processors need a breather. Try again in a minute. 🤖⏱️"
+      });
+    }
+
+    // Check concurrent request limit
+    if (activeRequests >= MAX_CONCURRENT_REQUESTS) {
+      return res.json({
+        response: "Cadet, the ship's AI is currently assisting other crew members. Please wait a moment and try again. 🚀⏳"
+      });
+    }
+
+    // Track this request
+    recentRequests.push(now);
+    requestTracker.set(pseudonym, recentRequests);
+    activeRequests++;
+
+    // Filter profanity
+    const cleanMessage = leoProfanity.clean(message);
+
+    // Check content safety
+    if (!isContentSafe(cleanMessage)) {
+      activeRequests--; // Don't count safety rejections against concurrent limit
+      return res.json({
+        response: "🚀 Cadet, I'm Valiant Inquiry, your ship's AI! I will only discuss space exploration, planets, stars, and our current mission. What would you like to know about the cosmos?"
+      });
+    }
+
+    // Load mission data for context
+    const missionData = loadMissionData();
+    const students = loadJSON(studentsPath);
+    const student = students.find(s => s.pseudonym === pseudonym);
+    const teamInfo = student ? `You are part of the ${student.team} Team crew.` : '';
+
+    // Optimized system prompt (shorter for better performance)
+    const systemPrompt = `You are Valiant Inquiry, the shipboard AI. You are knowledgeable, slightly sarcastic, and speak to 5th grade students (age 11) with wit.
+
+MISSION: ${missionData.currentMission}
+${teamInfo}
+
+PERSONALITY: Mildly snarky but helpful. Use "Cadet" always.
+RULES: Space topics only, 5th grade vocabulary, keep responses under 100 words but ALWAYS complete your sentences, be witty but educational.
+
+Be a smart AI with personality - not a kids' robot!`;
+
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    try {
+      // Make request to local Ollama with timeout
+      const response = await fetch('http://127.0.0.1:8081/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "Valiant Inquiry",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: cleanMessage }
+          ],
+          temperature: 0.4,
+          max_tokens: 150, // Increased to allow complete responses
+          top_p: 0.9
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Ollama API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const aiResponse = data.choices[0].message.content;
+
+      // Final safety check on AI response
+      const cleanResponse = leoProfanity.clean(aiResponse);
+
+      res.json({ response: cleanResponse });
+
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      
+      if (fetchError.name === 'AbortError') {
+        throw new Error('Request timeout');
+      }
+      throw fetchError;
+    }
+
+  } catch (error) {
+    console.error('Chat API error:', error);
+    
+    if (error.message === 'Request timeout') {
+      res.json({ 
+        response: 'Cadet, my processors are running a bit slow right now. Give me a moment and try that question again! 🤖⚡' 
+      });
+    } else {
+      res.json({ 
+        response: 'Unable to contact ship AI at this time. The server hamsters might be taking a coffee break. ☕🐹' 
+      });
+    }
+  } finally {
+    // Always decrement active requests
+    activeRequests--;
+  }
+});
+
+app.get('/admin/performance', requireAdmin, (req, res) => {
+  res.json({
+    activeRequests,
+    totalTrackedStudents: requestTracker.size,
+    serverUptime: process.uptime(),
+    memoryUsage: process.memoryUsage(),
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Mission management endpoints for admin
+app.get('/admin/mission', requireAdmin, (req, res) => {
+  const missionData = loadMissionData();
+  res.json(missionData);
+});
+
+app.post('/admin/mission', requireAdmin, (req, res) => {
+  try {
+    const { currentMission, missionBriefing, shipStatus } = req.body;
+    const missionData = {
+      currentMission: currentMission || "Explore the galaxy",
+      missionBriefing: missionBriefing || "Learn about space",
+      shipStatus: shipStatus || "Systems operational",
+      lastUpdated: new Date().toISOString()
+    };
+    
+    fs.writeFileSync(missionPath, JSON.stringify(missionData, null, 2));
+    res.json({ success: true, mission: missionData });
+  } catch (error) {
+    console.error('Error updating mission:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 app.post("/login", (req, res) => {
