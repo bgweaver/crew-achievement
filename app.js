@@ -211,7 +211,83 @@ function calculateBalancedTeamScores(students, achievements) {
   
   return teams;
 }
+function grantHiddenAchievement(student, achievementId) {
+  if (!student.unlocked.includes(achievementId)) {
+    const currentTime = new Date().toISOString();
+    student.unlocked.push(achievementId);
+    
+    if (!student.achievementDates) student.achievementDates = {};
+    student.achievementDates[achievementId] = currentTime;
+    
+    console.log(`🌟 Hidden achievement unlocked: ${achievementId} for ${student.pseudonym}`);
+    return true;
+  }
+  return false;
+}
 
+function checkForHiddenAchievements(pseudonym, message = null) {
+  const students = loadJSON(studentsPath);
+  const student = students.find(s => s.pseudonym === pseudonym);
+  if (!student) return;
+  
+  let achievementGranted = false;
+  
+  // First Contact - first AI chat
+  if (message && !student.unlocked.includes('first_contact')) {
+    grantHiddenAchievement(student, 'first_contact');
+    achievementGranted = true;
+  }
+  
+  // Space Philosopher - deep questions
+  if (message) {
+    const deepWords = ['why does', 'why do', 'how did', 'how does', 'universe', 'infinite', 'beginning', 'meaning', 'purpose', 'exist', 'created', 'formed'];
+    const hasDeepQuestion = deepWords.some(word => message.toLowerCase().includes(word));
+    
+    if (hasDeepQuestion && !student.unlocked.includes('space_philosopher')) {
+      grantHiddenAchievement(student, 'space_philosopher');
+      achievementGranted = true;
+    }
+  }
+  
+  // Night Owl - login after 6 PM
+  const currentHour = new Date().getHours();
+  if (currentHour >= 18 && !student.unlocked.includes('night_owl')) {
+    grantHiddenAchievement(student, 'night_owl');
+    achievementGranted = true;
+  }
+  
+  // Shooting Star - 1% random chance
+  if (Math.random() < 0.01 && !student.unlocked.includes('shooting_star')) {
+    grantHiddenAchievement(student, 'shooting_star');
+    achievementGranted = true;
+  }
+  
+  // Speed of Light - 7 day login streak
+  if (!student.unlocked.includes('speed_of_light')) {
+    if (!student.loginStreak) student.loginStreak = 0;
+    if (!student.lastLoginDate) student.lastLoginDate = new Date().toDateString();
+    
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    
+    if (student.lastLoginDate === yesterday) {
+      student.loginStreak += 1;
+    } else if (student.lastLoginDate !== today) {
+      student.loginStreak = 1;
+    }
+    
+    student.lastLoginDate = today;
+    
+    if (student.loginStreak >= 7) {
+      grantHiddenAchievement(student, 'speed_of_light');
+      achievementGranted = true;
+    }
+  }
+  
+  if (achievementGranted) {
+    saveJSON(studentsPath, students);
+  }
+}
 // Function to calculate student rank among all students
 function calculateStudentRank(studentPseudonym, students, achievements) {
   // Calculate points for all students
@@ -230,7 +306,142 @@ function calculateStudentRank(studentPseudonym, students, achievements) {
   const studentIndex = studentsWithPoints.findIndex(s => s.pseudonym === studentPseudonym);
   return studentIndex !== -1 ? studentIndex + 1 : students.length;
 }
+// Enhanced ISS API that shows country/location
+app.get('/api/iss', async (req, res) => {
+  try {
+    const fetch = (await import('node-fetch')).default;
+    
+    // Get ISS position
+    const issResponse = await fetch('http://api.open-notify.org/iss-now.json');
+    const issData = await issResponse.json();
+    
+    const { latitude, longitude } = issData.iss_position;
+    
+    // Convert coordinates to location using reverse geocoding
+    let locationInfo = {
+      country: "somewhere over Earth",
+      description: "the middle of nowhere",
+      ocean: false
+    };
+    
+    try {
+      // Using BigDataCloud's free reverse geocoding API (no key required)
+      const geoResponse = await fetch(
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+      );
+      
+      if (geoResponse.ok) {
+        const geoData = await geoResponse.json();
+        
+        // Check if it's over water
+        if (geoData.countryCode === "" || geoData.countryName === "") {
+          // It's over an ocean or sea
+          const oceanName = getOceanName(parseFloat(latitude), parseFloat(longitude));
+          locationInfo = {
+            country: oceanName,
+            description: `flying over the ${oceanName}`,
+            ocean: true,
+            emoji: "🌊"
+          };
+        } else {
+          // It's over land
+          const country = geoData.countryName || "an unknown country";
+          const city = geoData.city || geoData.locality || "";
+          
+          locationInfo = {
+            country: country,
+            description: city ? `flying over ${city}, ${country}` : `flying over ${country}`,
+            ocean: false,
+            emoji: getCountryEmoji(country)
+          };
+        }
+      }
+    } catch (geoError) {
+      console.log('Geocoding failed, using coordinates only:', geoError.message);
+    }
+    
+    // Create kid-friendly response
+    const response = {
+      ...issData,
+      location: locationInfo,
+      kid_friendly: {
+        message: `🛰️ The International Space Station is currently ${locationInfo.description}!`,
+        coordinates: `${latitude}°, ${longitude}°`,
+        altitude: "approximately 408 kilometers (254 miles) above Earth",
+        speed: "traveling at 27,600 km/h (17,150 mph)",
+        fun_fact: getRandomISSFact()
+      }
+    };
+    
+    res.json(response);
+    
+  } catch (error) {
+    console.error('ISS API error:', error);
+    res.status(500).json({ 
+      error: 'ISS data unavailable',
+      kid_friendly: {
+        message: "🛰️ Sorry cadet, we can't track the space station right now. Try again in a moment!"
+      }
+    });
+  }
+});
 
+// Helper function to determine which ocean based on coordinates
+function getOceanName(lat, lng) {
+  // Very simplified ocean detection
+  if (lat > 60) return "Arctic Ocean";
+  if (lat < -60) return "Antarctic Ocean";
+  
+  // Atlantic Ocean (roughly -80 to 20 longitude)
+  if (lng >= -80 && lng <= 20) return "Atlantic Ocean";
+  
+  // Indian Ocean (roughly 20 to 120 longitude)
+  if (lng > 20 && lng <= 120) return "Indian Ocean";
+  
+  // Pacific Ocean (everything else)
+  return "Pacific Ocean";
+}
+
+// Helper function to get country emoji (simplified)
+function getCountryEmoji(country) {
+  const countryEmojis = {
+    "United States": "🇺🇸",
+    "Canada": "🇨🇦", 
+    "Mexico": "🇲🇽",
+    "Brazil": "🇧🇷",
+    "United Kingdom": "🇬🇧",
+    "France": "🇫🇷",
+    "Germany": "🇩🇪",
+    "Italy": "🇮🇹",
+    "Spain": "🇪🇸",
+    "Russia": "🇷🇺",
+    "China": "🇨🇳",
+    "Japan": "🇯🇵",
+    "India": "🇮🇳",
+    "Australia": "🇦🇺",
+    "South Africa": "🇿🇦",
+    "Egypt": "🇪🇬",
+    "Nigeria": "🇳🇬"
+  };
+  
+  return countryEmojis[country] || "🌍";
+}
+
+// Random ISS facts for kids
+function getRandomISSFact() {
+  const facts = [
+    "The ISS orbits Earth once every 90 minutes!",
+    "Astronauts on the ISS see 16 sunrises and sunsets every day!",
+    "The ISS is about the size of a football field!",
+    "The ISS has been continuously occupied since November 2000!",
+    "Astronauts float around inside because they're in zero gravity!",
+    "The ISS travels fast enough to go from New York to Los Angeles in 10 minutes!",
+    "The ISS weighs about 420,000 kilograms (925,000 pounds)!",
+    "Astronauts exercise 2.5 hours a day to stay healthy in space!"
+  ];
+  
+  return facts[Math.floor(Math.random() * facts.length)];
+}
 // Function to migrate existing students to have achievement dates
 function migrateStudentAchievementDates() {
   const students = loadJSON(studentsPath);
@@ -348,6 +559,7 @@ app.get("/", (req, res) => {
   res.render("login", { teamScores, error: null });
 });
 
+
 app.post('/api/chat', async (req, res) => {
   if (!req.session.userId && !req.body.pseudonym) {
     return res.status(401).json({ error: 'Authentication required' });
@@ -400,16 +612,19 @@ app.post('/api/chat', async (req, res) => {
     const student = students.find(s => s.pseudonym === pseudonym);
     const teamInfo = student ? `You are part of the ${student.team} Team crew.` : '';
 
-    // Optimized system prompt (shorter for better performance)
-    const systemPrompt = `You are Valiant Inquiry, the shipboard AI. You are knowledgeable, slightly sarcastic, and speak to 5th grade students (age 11) with wit.
+    // Concise system prompt for proper tone
+    const systemPrompt = `You are Valiant Inquiry, shipboard AI. Speak to 11-year-old students as intelligent junior officers, not babies. 
+
+PERSONALITY: Mildly sarcastic but helpful. Think "smart ship computer meets slightly impatient mentor."
+
+RULES: 
+- ALWAYS call them "Cadet"
+- Use proper vocabulary - they're 11, not 5  
+- Space topics only, under 100 words
+- Example tone: "Well Cadet, stars create energy by smashing hydrogen atoms together - cosmic alchemy that's lit up the universe for billions of years."
 
 MISSION: ${missionData.currentMission}
-${teamInfo}
-
-PERSONALITY: Mildly snarky but helpful. Use "Cadet" always.
-RULES: Space topics only, 5th grade vocabulary, keep responses under 100 words but ALWAYS complete your sentences, be witty but educational.
-
-Be a smart AI with personality - not a kids' robot!`;
+${teamInfo}`;
 
     // Create AbortController for timeout
     const controller = new AbortController();
@@ -429,7 +644,7 @@ Be a smart AI with personality - not a kids' robot!`;
             { role: "user", content: cleanMessage }
           ],
           temperature: 0.4,
-          max_tokens: 150, // Increased to allow complete responses
+          max_tokens: 150,
           top_p: 0.9
         }),
         signal: controller.signal
@@ -443,10 +658,14 @@ Be a smart AI with personality - not a kids' robot!`;
 
       const data = await response.json();
       const aiResponse = data.choices[0].message.content;
+      
+      // Check for hidden achievements
+      checkForHiddenAchievements(pseudonym, cleanMessage);
 
-      // Final safety check on AI response
+      // Final safety check on AI response - FIXED: Declare before use
       const cleanResponse = leoProfanity.clean(aiResponse);
 
+      // Send only one response - FIXED: Removed duplicate
       res.json({ response: cleanResponse });
 
     } catch (fetchError) {
@@ -550,13 +769,26 @@ app.post("/login", (req, res) => {
   // Calculate student's overall rank
   const studentRank = calculateStudentRank(pseudonym, students, achievements);
 
+ checkForHiddenAchievements(pseudonym);
+
   // Update last login time
   student.lastLogin = currentLogin.toISOString();
   saveJSON(studentsPath, students);
 
+  // Filter out hidden achievements that aren't unlocked yet
+  const visibleAchievements = achievements.filter(a => 
+    !a.hidden || unlocked.includes(a.id)
+  );
+
+  visibleAchievements.sort((a, b) => {
+    const aUnlocked = unlocked.includes(a.id);
+    const bUnlocked = unlocked.includes(b.id);
+    return (aUnlocked === bUnlocked) ? 0 : aUnlocked ? -1 : 1;
+  });
+
   res.render("dashboard", { 
     pseudonym, 
-    achievements, 
+    achievements: visibleAchievements,  // Changed this line
     unlocked, 
     totalPoints,
     team: student.team,
